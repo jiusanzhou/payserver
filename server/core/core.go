@@ -30,16 +30,23 @@ type Order struct {
 	ORedirectUrl string  `json:"redirect_url,omitempty" yaml:"redirect_url"` // 支付成功后的重定向地址
 	OExtension   string  `json:"extension,omitempty" yaml:"extension"`       // 其他额外星系
 
+	QrData      string  `json:"qr_data,omitempty" yaml:"qr_data"`           // qrcode data
+	QrImageUrl  string  `json:"qr_image_url,omitempty" yaml:"qr_image_url"` // qrcode image url
 	SignedPrice float32 `json:"signed_price,omitempty" yaml:"signed_price"` // 唯一价格
 	Status      int     `json:"status,omitempty" yaml:"status"`             // 订单状态 0 unpaid, 1 paid, -1 expiry
 }
 
 // Record -> Order 收款记录
 type Record struct {
-	Model
+	Model `json:"model,omitempty" yaml:"model"`
 
-	OType        string  `json:"o_type,omitempty" yaml:"o_type"`             // wechat / alipay
+	// belong to who?
+	Channel   string  `json:"channel,omitempty" yaml:"channel"` // 区分多个账号 xxx
+	PayType   string  `json:"o_type,omitempty" yaml:"o_type"`   // wechat / alipay
+	PayAmount float32 `json:"amount,omitempty" yaml:"amount"`   // received money
 }
+
+// Qrcode ? 二维码
 
 // Model for basic
 type Model struct {

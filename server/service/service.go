@@ -14,33 +14,48 @@
  * limitations under the License.
  */
 
-package main
+package service
 
 import (
-	"log"
+	"fmt"
 
-	"go.zoe.im/x/cli"
+	"go.zoe.im/payserver/server/config"
+	"go.zoe.im/payserver/server/store"
 
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
+	"go.zoe.im/x"
 )
 
-func main() {
-	svr := service.New()
+type Server struct {
+	*config.Config
 
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			err := svr.Run()
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
+	store store.Storage
+}
 
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+func (s *Server) Run() error {
+	var err error
+
+	// init or start other things
+	s.store, err = store.New(s.DB)
+	if err != nil {
+		return err
 	}
+
+	err = x.GraceRun(func() error {
+
+		err := s.startHTTP()
+		fmt.Println(err)
+		return err
+	})
+
+	fmt.Println("\nExit service ...")
+
+	return err
+}
+
+func New() *Server {
+	s := &Server{
+		Config: config.NewConfig(),
+	}
+
+	return s
 }

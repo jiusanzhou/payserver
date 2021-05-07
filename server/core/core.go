@@ -16,24 +16,29 @@
 
 package core
 
-import "time"
-
 // Order create a order for pay 订单
 type Order struct {
 	Model `json:"model,omitempty" yaml:"model"`
 
-	AID string `json:"aid,omitempty" yaml:"aid"` // 应用ID
+	AppID string `json:"app_id,omitempty" yaml:"app_id"` // 应用ID
 
-	OID          string  `json:"oid,omitempty" yaml:"oid"`                   // 订单ID
-	OName        string  `json:"o_name,omitempty" yaml:"o_name"`             // 订单名
-	OPrice       float32 `json:"o_price,omitempty" yaml:"o_price"`           // 订单价格 0.00
-	ORedirectUrl string  `json:"redirect_url,omitempty" yaml:"redirect_url"` // 支付成功后的重定向地址
-	OExtension   string  `json:"extension,omitempty" yaml:"extension"`       // 其他额外星系
+	PreOrder PreOrder `gorm:"embedded;embeddedPrefix:o_"`
 
+	ExpiresIn   int     `json:"expires_in,omitempty" yaml:"expires_in"`     // 过期时间(秒)
 	QrData      string  `json:"qr_data,omitempty" yaml:"qr_data"`           // qrcode data
 	QrImageUrl  string  `json:"qr_image_url,omitempty" yaml:"qr_image_url"` // qrcode image url
 	SignedPrice float32 `json:"signed_price,omitempty" yaml:"signed_price"` // 唯一价格
-	Status      int     `json:"status,omitempty" yaml:"status"`             // 订单状态 0 unpaid, 1 paid, -1 expiry
+
+	PayRecord *Record `json:"pay_record,omitempty" yaml:"pay_record"` // 支付记录
+	Status    int     `json:"status,omitempty" yaml:"status"`         // 订单状态 0 unpaid, 1 paid, -1 expiry
+}
+
+type PreOrder struct {
+	ID          string  `json:"id,omitempty" yaml:"id"`                     // 订单ID
+	Name        string  `json:"name,omitempty" yaml:"name"`                 // 订单名
+	Price       float32 `json:"price,omitempty" yaml:"price"`               // 订单价格 0.00
+	RedirectUrl string  `json:"redirect_url,omitempty" yaml:"redirect_url"` // 支付成功后的重定向地址
+	Extension   string  `json:"extension,omitempty" yaml:"extension"`       // 其他额外信息
 }
 
 // Record -> Order 收款记录
@@ -47,11 +52,3 @@ type Record struct {
 }
 
 // Qrcode ? 二维码
-
-// Model for basic
-type Model struct {
-	ID        string     `gorm:"primary_key" json:"id,omitempty" yaml:"id"`
-	CreatedAt time.Time  `json:"created_at,omitempty" yaml:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at,omitempty" yaml:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty" yaml:"deleted_at"`
-}

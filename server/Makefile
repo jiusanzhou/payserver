@@ -34,4 +34,4 @@ vet:
 # Build manager binary, # --ldflags '-linkmode external -w -extldflags "-static"'
 # -w -s
 main: fmt vet
-	CGO_ENABLED=0 go build --ldflags '$(BUILD_LDFLAGS) -w -s' -o dist/payserver .
+	CGO_ENABLED=1 go build --ldflags '$(BUILD_LDFLAGS) -w -s' -o dist/payserver .

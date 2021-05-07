@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 
-package main
+package msql
 
 import (
-	"log"
-
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
+	"go.zoe.im/payserver/server/core"
+	"go.zoe.im/payserver/server/store"
 )
 
-func main() {
-	svr := service.New()
+func (d driver) CreateRecord(*core.Record) (*core.Record, error) {
 
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			err := svr.Run()
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
+	return nil, store.ErrNoImplement
+}
 
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+func (d driver) UpdateRecord(*core.Record) (*core.Record, error) {
+
+	return nil, store.ErrNoImplement
+}
+
+func (d driver) DeleteRecord(id string) error {
+
+	return store.ErrNoImplement
 }

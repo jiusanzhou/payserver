@@ -14,33 +14,15 @@
  * limitations under the License.
  */
 
-package main
+package config
 
-import (
-	"log"
+type Config struct {
+	Addr string `json:"addr,omitempty" yaml:"addr"`
+	DB   string `json:"db,omitempty" yaml:"db"`
+}
 
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			err := svr.Run()
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+func NewConfig() *Config {
+	return &Config{
+		Addr: ":30911",
 	}
 }

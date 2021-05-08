@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-package main
+package service
 
-import (
-	"log"
+import "go.zoe.im/payserver/server/core"
 
-	"go.zoe.im/x/cli"
+// 创建订单
+// 分配余额
 
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
+// 设备(代表账号) + type + 金额 => primary
 
-	_ "go.zoe.im/payserver/server/store/msql"
-)
+// app 与 设备 多对多
+// app
 
-func main() {
-	svr := service.New()
+// user no need!!!
 
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
+func (s *Server) CreateOrder(preorder *core.PreOrder) (*core.Order, error) {
 
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+	return nil, nil
+}
+
+func (s *Server) GetOrder(uid string) (*core.Order, error) {
+
+	return nil, nil
+}
+
+func (s *Server) GetOrderStatus(uid string) (*core.Order, error) {
+
+	return nil, nil
+}
+
+func (s *Server) CancelOrder(preorder *core.PreOrder) (*core.Order, error) {
+
+	return nil, nil
 }

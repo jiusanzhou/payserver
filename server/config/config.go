@@ -17,8 +17,10 @@
 package config
 
 type Config struct {
-	Addr string `json:"addr,omitempty" yaml:"addr"`
-	DB   string `json:"db,omitempty" yaml:"db"`
+	Addr            string `json:"addr,omitempty" yaml:"addr"`
+	DB              string `json:"db,omitempty" yaml:"db"`
+	Debug           bool   `json:"debug,omitempty" yaml:"debug"`
+	HTTPAllowOrigin string `json:"http_allow_origin,omitempty" yaml:"http_allow_origin"`
 }
 
 func NewConfig() *Config {

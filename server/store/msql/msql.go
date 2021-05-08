@@ -40,14 +40,15 @@ var DBConn *gorm.DB
 
 type driver struct {
 	db *gorm.DB // The main db object
+	c  *store.Config
 }
 
 // New 创建数据库
-func New(c string) (store.Storage, error) {
+func New(c *store.Config) (store.Storage, error) {
 	dbConfig := &gorm.Config{}
 
 	// turn on debug for msql
-	if os.Getenv("MSQL_DEBUG") != "" {
+	if c.Debug {
 		dbConfig.Logger = logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 			logger.Config{
@@ -61,13 +62,13 @@ func New(c string) (store.Storage, error) {
 	var err error
 	d := &driver{}
 
-	if c == "" {
-		c = "sqlite3://default.sqlite3"
+	if c.URI == "" {
+		c.URI = "sqlite3://default.sqlite3"
 	}
 
-	parts := strings.Split(c, "://")
+	parts := strings.Split(c.URI, "://")
 	if len(parts) != 2 {
-		return nil, fmt.Errorf("schema not supported: %s", c)
+		return nil, fmt.Errorf("schema not supported: %s", c.URI)
 	}
 
 	dial, err := OpenDialector(parts[0], parts[1])
@@ -79,6 +80,8 @@ func New(c string) (store.Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// global store the db
 	DBConn = d.db
 
 	// init/create the table if we need

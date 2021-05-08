@@ -28,6 +28,9 @@ var (
 		cli.Name("payserver"),
 		cli.Short("payserver is a server for pay."),
 		version.NewOption(true),
+		cli.Run(func(c *cli.Command, args ...string) {
+			c.Help()
+		}),
 	)
 )
 

@@ -47,7 +47,7 @@ type RecordStore interface {
 // ===========================================================
 
 // StorageCreator create a storage
-type StorageCreator func(c string) (Storage, error)
+type StorageCreator func(*Config) (Storage, error)
 
 var (
 	// ErrNoImplement db storage implement
@@ -68,10 +68,12 @@ var (
 
 // New create storage from string
 // TODO: 一个 string 字段来做 configuration 行不行?
-func New(c string) (Storage, error) {
+func New(opts ...Option) (Storage, error) {
+
+	c := NewConfig(opts...)
 
 	// parse schema
-	schema := strings.Split(c, SchemaSpliter)[0]
+	schema := strings.Split(c.URI, SchemaSpliter)[0]
 
 	r, ok := registry[schema]
 	if !ok {

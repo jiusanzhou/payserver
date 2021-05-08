@@ -35,19 +35,18 @@ func (s *Server) Run() error {
 	var err error
 
 	// init or start other things
-	s.store, err = store.New(s.DB)
+	s.store, err = store.New(store.OptionURI(s.DB), store.OptionDebug(s.Debug))
 	if err != nil {
 		return err
 	}
 
 	err = x.GraceRun(func() error {
-
-		err := s.startHTTP()
-		fmt.Println(err)
-		return err
+		return s.startHTTP()
 	})
 
 	fmt.Println("\nExit service ...")
+
+	// TODO: clean
 
 	return err
 }

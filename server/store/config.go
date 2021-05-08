@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package main
+package store
 
-import (
-	"log"
+// Config ...
+type Config struct {
+	URI   string
+	Debug bool
+}
 
-	"go.zoe.im/x/cli"
+func NewConfig(opts ...Option) *Config {
+	c := &Config{}
+	for _, i := range opts {
+		i(c)
+	}
+	return c
+}
 
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
+type Option func(c *Config)
 
-	_ "go.zoe.im/payserver/server/store/msql"
-)
+func OptionURI(u string) Option {
+	return func(c *Config) {
+		c.URI = u
+	}
+}
 
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+func OptionDebug(v bool) Option {
+	return func(c *Config) {
+		c.Debug = v
 	}
 }

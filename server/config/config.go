@@ -16,15 +16,24 @@
 
 package config
 
+import "go.zoe.im/payserver/server/core"
+
 type Config struct {
 	Addr            string `json:"addr,omitempty" yaml:"addr"`
 	DB              string `json:"db,omitempty" yaml:"db"`
 	Debug           bool   `json:"debug,omitempty" yaml:"debug"`
 	HTTPAllowOrigin string `json:"http_allow_origin,omitempty" yaml:"http_allow_origin"`
+
+	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"`
+	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`
+
+	// app can be created by api
+	Apps []core.App `opts:"-" json:"apps,omitempty" yaml:"apps"`
 }
 
 func NewConfig() *Config {
 	return &Config{
-		Addr: ":30911",
+		Addr:       ":30911",
+		PriceFloor: 20,
 	}
 }

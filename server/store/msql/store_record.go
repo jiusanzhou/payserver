@@ -21,12 +21,12 @@ import (
 	"go.zoe.im/payserver/server/store"
 )
 
-func (d driver) CreateRecord(*core.Record) (*core.Record, error) {
+func (d driver) CreateRecord(*core.PayRecord) (*core.PayRecord, error) {
 
 	return nil, store.ErrNoImplement
 }
 
-func (d driver) UpdateRecord(*core.Record) (*core.Record, error) {
+func (d driver) UpdateRecord(*core.PayRecord) (*core.PayRecord, error) {
 
 	return nil, store.ErrNoImplement
 }

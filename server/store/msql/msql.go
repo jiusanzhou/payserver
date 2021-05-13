@@ -86,8 +86,11 @@ func New(c *store.Config) (store.Storage, error) {
 
 	// init/create the table if we need
 	return d, d.db.AutoMigrate(
+		&core.App{},
+		&core.Agent{},
 		&core.Order{},
-		&core.Record{},
+		&core.Account{},
+		&core.PayRecord{},
 	)
 }
 

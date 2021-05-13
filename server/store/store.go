@@ -32,15 +32,15 @@ type Storage interface {
 
 type OrderStore interface {
 	CreateOrder(*core.Order) (*core.Order, error)
-	UpdateOrder(*core.Record) (*core.Record, error)
+	UpdateOrder(*core.PayRecord) (*core.PayRecord, error)
 	DeleteOrder(id string) error
 	GetOrder(id string) (*core.Order, error)
 	GetOrderByOID(oid string) (*core.Order, error)
 }
 
 type RecordStore interface {
-	CreateRecord(*core.Record) (*core.Record, error)
-	UpdateRecord(*core.Record) (*core.Record, error)
+	CreateRecord(*core.PayRecord) (*core.PayRecord, error)
+	UpdateRecord(*core.PayRecord) (*core.PayRecord, error)
 	DeleteRecord(id string) error
 }
 

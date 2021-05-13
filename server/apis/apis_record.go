@@ -14,34 +14,31 @@
  * limitations under the License.
  */
 
-package msql
+package apis
 
 import (
-	"go.zoe.im/payserver/server/core"
-	"go.zoe.im/payserver/server/store"
+	"net/http"
+
+	"go.zoe.im/x/httputil"
 )
 
-func (d driver) CreateOrder(*core.Order) (*core.Order, error) {
+func (wa *WebAPI) HandleCreateRecord(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer r.Body.Close()
 
-	return nil, store.ErrNoImplement
+	wr.Flush()
 }
 
-func (d driver) UpdateOrder(*core.PayRecord) (*core.PayRecord, error) {
+func (wa *WebAPI) HandleGetRecord(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer r.Body.Close()
 
-	return nil, store.ErrNoImplement
+	wr.Flush()
 }
 
-func (d driver) DeleteOrder(id string) error {
+func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer r.Body.Close()
 
-	return store.ErrNoImplement
-}
-
-func (d driver) GetOrder(id string) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
-}
-
-func (d driver) GetOrderByOID(oid string) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
+	wr.Flush()
 }

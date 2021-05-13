@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package msql
+package server
 
-import (
-	"go.zoe.im/payserver/server/core"
-	"go.zoe.im/payserver/server/store"
-)
+import "go.zoe.im/payserver/server/core"
 
-func (d driver) CreateOrder(*core.Order) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
+// CreateOrder create the order from backend service
+func (s *Server) CreateOrder(appid string, preorder *core.PreOrder) (*core.Order, error) {
+	// generate the <agent>-<type>-<price>
+	return nil, nil
 }
 
-func (d driver) UpdateOrder(*core.PayRecord) (*core.PayRecord, error) {
+func (s *Server) GetOrder(uid string) (*core.Order, error) {
 
-	return nil, store.ErrNoImplement
+	return nil, nil
 }
 
-func (d driver) DeleteOrder(id string) error {
+func (s *Server) GetOrderStatus(uid string) (*core.Order, error) {
 
-	return store.ErrNoImplement
+	return nil, nil
 }
 
-func (d driver) GetOrder(id string) (*core.Order, error) {
+func (s *Server) CancelOrder(uid string) (*core.Order, error) {
 
-	return nil, store.ErrNoImplement
-}
-
-func (d driver) GetOrderByOID(oid string) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
+	return nil, nil
 }

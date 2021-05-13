@@ -16,8 +16,6 @@
 
 package service
 
-import "go.zoe.im/payserver/server/core"
-
 // 创建订单
 // 分配余额
 
@@ -26,24 +24,6 @@ import "go.zoe.im/payserver/server/core"
 // app 与 设备 多对多
 // app
 
+// heartbeat for device
+
 // user no need!!!
-
-func (s *Server) CreateOrder(preorder *core.PreOrder) (*core.Order, error) {
-
-	return nil, nil
-}
-
-func (s *Server) GetOrder(uid string) (*core.Order, error) {
-
-	return nil, nil
-}
-
-func (s *Server) GetOrderStatus(uid string) (*core.Order, error) {
-
-	return nil, nil
-}
-
-func (s *Server) CancelOrder(preorder *core.PreOrder) (*core.Order, error) {
-
-	return nil, nil
-}

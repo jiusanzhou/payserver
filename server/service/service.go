@@ -19,19 +19,23 @@ package service
 import (
 	"fmt"
 
+	"go.zoe.im/payserver/server/apis"
 	"go.zoe.im/payserver/server/config"
+	"go.zoe.im/payserver/server/server"
 	"go.zoe.im/payserver/server/store"
 
 	"go.zoe.im/x"
 )
 
-type Server struct {
+type Service struct {
 	*config.Config
 
-	store store.Storage
+	store  store.Storage
+	server *server.Server
+	webapi *apis.WebAPI
 }
 
-func (s *Server) Run() error {
+func (s *Service) Run() error {
 	var err error
 
 	// init or start other things
@@ -40,6 +44,11 @@ func (s *Server) Run() error {
 		return err
 	}
 
+	// TODO: inject?
+	s.server = server.New(s.store)
+	s.webapi = apis.NewWebAPI(s.server)
+
+	// grace start
 	err = x.GraceRun(func() error {
 		return s.startHTTP()
 	})
@@ -51,8 +60,8 @@ func (s *Server) Run() error {
 	return err
 }
 
-func New() *Server {
-	s := &Server{
+func New() *Service {
+	s := &Service{
 		Config: config.NewConfig(),
 	}
 

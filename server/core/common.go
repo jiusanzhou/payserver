@@ -38,6 +38,30 @@ type Model struct {
 }
 
 // BeforeCreate ...
+func (act *App) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
+}
+
+// BeforeCreate ...
+func (act *Agent) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
+}
+
+// BeforeCreate ...
 func (act *Order) BeforeCreate(tx *gorm.DB) error {
 	act.UID = uuid.New().String()
 
@@ -50,7 +74,7 @@ func (act *Order) BeforeCreate(tx *gorm.DB) error {
 }
 
 // BeforeCreate ...
-func (act *Record) BeforeCreate(tx *gorm.DB) error {
+func (act *PayRecord) BeforeCreate(tx *gorm.DB) error {
 	act.UID = uuid.New().String()
 
 	t := time.Now()

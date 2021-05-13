@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-
 	"go.zoe.im/payserver/server/utils"
 	"go.zoe.im/x/version"
 	// "go.zoe.im/payserver/server/ui"
@@ -22,7 +21,7 @@ func HandleStat(w http.ResponseWriter, r *http.Request) {
 	// TODO: return stat of the process
 }
 
-func (s *Server) installHandler(r *mux.Router) {
+func (s *Service) installHandler(r *mux.Router) {
 	r.HandleFunc("/_healthz", HandleHealth)
 
 	// install ui
@@ -35,10 +34,10 @@ func (s *Server) installHandler(r *mux.Router) {
 		r.Use(utils.WithHeader("Access-Control-Allow-Origin", func(r *http.Request) string { return s.Config.HTTPAllowOrigin }))
 	}
 
-	NewWebAPI(s).Register(apiv1)
+	s.webapi.Register(apiv1)
 }
 
-func (s *Server) startHTTP() error {
+func (s *Service) startHTTP() error {
 
 	r := mux.NewRouter()
 

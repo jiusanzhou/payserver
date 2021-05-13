@@ -16,4 +16,50 @@
 
 package apis
 
-// create order
+import (
+	"github.com/gorilla/mux"
+
+	"go.zoe.im/payserver/server/server"
+)
+
+// TODO: auto generated from server.Server
+
+type WebAPI struct {
+	*server.Server
+}
+
+func (wa *WebAPI) Register(apiv1 *mux.Router) {
+	apiv1.HandleFunc("/order/{uid}", wa.HandleGetOrder).Methods("GET")
+	apiv1.HandleFunc("/order/{uid}/cancel", wa.HandleCancelOrder).Methods("POST") // TODO???
+	apiv1.HandleFunc("/order/{uid}/status", wa.HandleGetOrderStatus).Methods("GET")
+	// maybe confused with /order?uid
+	apiv1.HandleFunc("/order", wa.HandleCreateOrder).Methods("POST")
+
+	apiv1.HandleFunc("/records", wa.HandleCreateRecord).Methods("POST")
+	apiv1.HandleFunc("/record/{uid}", wa.HandleGetRecord).Methods("GET")
+	apiv1.HandleFunc("/records", wa.HandleListRecords).Methods("GET")
+
+	apiv1.HandleFunc("/agent/prepare", wa.HandlePrepareAgent).Methods("GET")
+	apiv1.HandleFunc("/agents", wa.HandlePrepareAgent).Methods("POST")
+	apiv1.HandleFunc("/agents", wa.HandleListAgents).Methods("GET")
+	apiv1.HandleFunc("/agent/{uid}", wa.HandleGetAgent).Methods("GET")
+	apiv1.HandleFunc("/agent/{uid}", wa.HandleDeleteAgent).Methods("DELETE")
+	apiv1.HandleFunc("/agent/{uid}", wa.HandleUpdateAgent).Methods("POST")
+	apiv1.HandleFunc("/agent/{uid}/heartbeat", wa.HandleHeartbeatAgent).Methods("POST")
+	apiv1.HandleFunc("/agent/{uid}/apps", wa.HandleListAppsByAgent).Methods("GET")
+	apiv1.HandleFunc("/agent/{uid}/records", wa.HandleListRecordsByAgent).Methods("GET")
+
+	apiv1.HandleFunc("/apps", wa.HandleListApp).Methods("GET")
+	apiv1.HandleFunc("/apps", wa.HandleCreateApp).Methods("POST")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleGetApp).Methods("GET")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleDeleteApp).Methods("DELETE")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleUpdateApp).Methods("POST")
+	apiv1.HandleFunc("/app/{uid}/agents", wa.HandleListAgentsByApp).Methods("GET")
+	apiv1.HandleFunc("/app/{uid}/records", wa.HandleListRecordsByApp).Methods("GET")
+}
+
+func NewWebAPI(s *server.Server) *WebAPI {
+	return &WebAPI{
+		Server: s,
+	}
+}

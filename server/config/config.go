@@ -23,9 +23,12 @@ type Config struct {
 	DB              string `json:"db,omitempty" yaml:"db"`
 	Debug           bool   `json:"debug,omitempty" yaml:"debug"`
 	HTTPAllowOrigin string `json:"http_allow_origin,omitempty" yaml:"http_allow_origin"`
+	Name            string `json:"name,omitempty" yaml:"name"`
 
 	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"`
 	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`
+
+	MaxPenddingAgent int `json:"max_pendding_agent,omitempty" yaml:"max_pendding_agent"`
 
 	// app can be created by api
 	Apps []core.App `opts:"-" json:"apps,omitempty" yaml:"apps"`

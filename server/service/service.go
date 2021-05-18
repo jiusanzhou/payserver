@@ -45,7 +45,7 @@ func (s *Service) Run() error {
 	}
 
 	// TODO: inject?
-	s.server = server.New(s.store)
+	s.server = server.New(s.Config, s.store)
 	s.webapi = apis.NewWebAPI(s.server)
 
 	// grace start

@@ -24,11 +24,12 @@ const (
 	AgentStatusNormal = iota
 	AgentStatusOffline
 	AgentStatusDisable
+	AgentStatusPendding
 	AgentStatusUnknown
 )
 
 var (
-	_AgentStatusStrings = []string{"normal", "offline", "disable", "unknown"}
+	_AgentStatusStrings = []string{"normal", "offline", "disable", "pendding", "unknown"}
 )
 
 func (o AgentStatus) String() string {
@@ -45,6 +46,7 @@ type Agent struct {
 	HeartbeatAt time.Time   `json:"heartbeat_at,omitempty" yaml:"heartbeat_at"`
 	Status      AgentStatus `json:"status,omitempty" yaml:"status"`
 
+	// for register a agent
 	Ticket string `gorm:"index" json:"ticket,omitempty" yaml:"ticket"`
 
 	// {}

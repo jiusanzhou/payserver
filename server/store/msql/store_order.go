@@ -37,11 +37,12 @@ func (d driver) DeleteOrder(id string) error {
 }
 
 func (d driver) GetOrder(id string) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
+	var or core.Order
+	return &or, d.Where("uid = ? AND delete_at == null", id).First(&or).Error
 }
 
 func (d driver) GetOrderByOID(oid string) (*core.Order, error) {
-
-	return nil, store.ErrNoImplement
+	// by order id, create from outside
+	var or core.Order
+	return &or, d.Where("o_number = ? AND delete_at == null", oid).First(&or).Error
 }

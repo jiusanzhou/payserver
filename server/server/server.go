@@ -17,16 +17,24 @@
 package server
 
 import (
+	"go.zoe.im/payserver/server/config"
 	"go.zoe.im/payserver/server/store"
 )
 
 type Server struct {
 	store store.Storage
+	c     *config.Config
 }
 
-func New(store store.Storage) *Server {
+func (s Server) Name() string {
+	// TODO:
+	return s.c.Name
+}
+
+func New(c *config.Config, store store.Storage) *Server {
 	s := &Server{
 		store: store,
+		c:     c,
 	}
 
 	return s

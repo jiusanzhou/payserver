@@ -26,8 +26,17 @@ import (
 
 // Storage for storage
 type Storage interface {
+	AgentStore
 	OrderStore
 	RecordStore
+}
+
+type AgentStore interface {
+	CreateAgent(*core.Agent) (*core.Agent, error)
+	UpdateAgent(*core.Agent) (*core.Agent, error)
+	GetAgentByTicket(ticket string) (*core.Agent, error)
+	CountPenddingAgents() (int, error)
+	ListAgents() ([]*core.Agent, error)
 }
 
 type OrderStore interface {
@@ -67,7 +76,6 @@ var (
 )
 
 // New create storage from string
-// TODO: 一个 string 字段来做 configuration 行不行?
 func New(opts ...Option) (Storage, error) {
 
 	c := NewConfig(opts...)

@@ -25,8 +25,8 @@ func (s *Server) CreateOrder(appid string, preorder *core.PreOrder) (*core.Order
 }
 
 func (s *Server) GetOrder(uid string) (*core.Order, error) {
-
-	return nil, nil
+	// some field we need to hidden
+	return s.store.GetOrder(uid)
 }
 
 func (s *Server) GetOrderStatus(uid string) (*core.Order, error) {

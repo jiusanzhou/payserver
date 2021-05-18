@@ -39,8 +39,9 @@ var _ store.Storage = (*driver)(nil)
 var DBConn *gorm.DB
 
 type driver struct {
-	db *gorm.DB // The main db object
-	c  *store.Config
+	*gorm.DB // The main db object
+
+	c *store.Config
 }
 
 // New 创建数据库
@@ -76,16 +77,16 @@ func New(c *store.Config) (store.Storage, error) {
 		return nil, err
 	}
 
-	d.db, err = gorm.Open(dial, dbConfig)
+	d.DB, err = gorm.Open(dial, dbConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	// global store the db
-	DBConn = d.db
+	DBConn = d.DB
 
 	// init/create the table if we need
-	return d, d.db.AutoMigrate(
+	return d, d.DB.AutoMigrate(
 		&core.App{},
 		&core.Agent{},
 		&core.Order{},

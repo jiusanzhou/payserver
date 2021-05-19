@@ -29,18 +29,17 @@ type WebAPI struct {
 }
 
 func (wa *WebAPI) Register(apiv1 *mux.Router) {
+	apiv1.HandleFunc("/order", wa.HandleCreateOrder).Methods("POST")
 	apiv1.HandleFunc("/order/{uid}", wa.HandleGetOrder).Methods("GET")
 	apiv1.HandleFunc("/order/{uid}/cancel", wa.HandleCancelOrder).Methods("POST") // TODO???
 	apiv1.HandleFunc("/order/{uid}/status", wa.HandleGetOrderStatus).Methods("GET")
-	// maybe confused with /order?uid
-	apiv1.HandleFunc("/order", wa.HandleCreateOrder).Methods("POST")
 
 	apiv1.HandleFunc("/records", wa.HandleCreateRecord).Methods("POST")
 	apiv1.HandleFunc("/record/{uid}", wa.HandleGetRecord).Methods("GET")
 	apiv1.HandleFunc("/records", wa.HandleListRecords).Methods("GET")
 
 	apiv1.HandleFunc("/agent/prepare", wa.HandlePrepareAgent).Methods("GET")
-	apiv1.HandleFunc("/agents", wa.HandlePrepareAgent).Methods("POST")
+	apiv1.HandleFunc("/agents", wa.HandleRegisterAgent).Methods("POST")
 	apiv1.HandleFunc("/agents", wa.HandleListAgents).Methods("GET")
 	apiv1.HandleFunc("/agent/{uid}", wa.HandleGetAgent).Methods("GET")
 	apiv1.HandleFunc("/agent/{uid}", wa.HandleDeleteAgent).Methods("DELETE")

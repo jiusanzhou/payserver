@@ -17,10 +17,10 @@
 package core
 
 const (
-	OrderStatusPending = iota
-	OrderStatusPaid
-	OrderStatusExpired
-	OrderStatusCanceled
+	OrderStatusPending = iota // wait for paid
+	OrderStatusPaid // paid
+	OrderStatusExpired // expired
+	OrderStatusCanceled //canceled
 	OrderStatusUnknown
 )
 
@@ -38,8 +38,7 @@ func (o OrderStatus) String() string {
 type Order struct {
 	Model `json:"model,omitempty" yaml:"model"`
 
-	AppID string `gorm:"index:app" json:"app_id,omitempty" yaml:"app_id"` // app id
-
+	AppID    string   `gorm:"index:pre_app_number,unique" json:"app_id,omitempty" yaml:"app_id"`
 	PreOrder PreOrder `gorm:"embedded;embeddedPrefix:o_" json:"pre_order,omitempty" yaml:"pre_order"`
 
 	ExpiresIn int `json:"expires_in,omitempty" yaml:"expires_in"` // expiry time (seconds)
@@ -49,7 +48,7 @@ type Order struct {
 
 	// sched unique(price-agent<device>-type)
 	SchedAgentUID string `gorm:"index:sched,unique" json:"sched_agent_uid,omitempty" yaml:"sched_agent_uid"` // agent
-	SchedPayType  string `gorm:"index:sched,unique" json:"sched_pay_type,omitempty" yaml:"sched_pay_type"`   // pay type
+	SchedPayType  PayType `gorm:"index:sched,unique" json:"sched_pay_type,omitempty" yaml:"sched_pay_type"`   // pay type
 	SchedPrice    int    `gorm:"index:sched,unique" json:"sched_price,omitempty" yaml:"sched_price"`         // unit cent
 
 	PayRecordUID string      `json:"-,omitempty" yaml:"-"`                                                  //
@@ -59,9 +58,9 @@ type Order struct {
 
 type PreOrder struct {
 	// custom order data
-	Number      string `gorm:"index:pre_order_number" json:"number,omitempty" yaml:"number"` // pre order number
-	Name        string `json:"name,omitempty" yaml:"name"`                                   // pre order name
-	Price       int    `json:"price,omitempty" yaml:"price"`                                 // pre order price unit cent
-	RedirectUrl string `json:"redirect_url,omitempty" yaml:"redirect_url"`                   // redirect url after success
-	External    string `json:"external,omitempty" yaml:"external"`                           // external info, like user
+	Number      string `gorm:"index:pre_app_number,unique" json:"number,omitempty" yaml:"number"` // pre order number
+	Name        string `json:"name,omitempty" yaml:"name"`                                        // pre order name
+	Price       int    `json:"price,omitempty" yaml:"price"`                                      // pre order price unit cent
+	RedirectUrl string `json:"redirect_url,omitempty" yaml:"redirect_url"`                        // redirect url after success
+	External    string `json:"external,omitempty" yaml:"external"`                                // external info, like user
 }

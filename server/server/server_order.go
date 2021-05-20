@@ -16,11 +16,55 @@
 
 package server
 
-import "go.zoe.im/payserver/server/core"
+import (
+	"errors"
+
+	"go.zoe.im/payserver/server/core"
+)
+
+var (
+	ErrOrderNumberExits = errors.New("order number already exits")
+	ErrUnsupportedPayMethod = errors.New("unsupported pay method")
+)
+
+func (s *Server) IsSupportedPayType(method string) bool {
+	return core.IsSupportedPayType(method)
+}
 
 // CreateOrder create the order from backend service
-func (s *Server) CreateOrder(appid string, preorder *core.PreOrder) (*core.Order, error) {
+func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*core.Order, error) {
+	// check <appid>-<order-number> if exits
+	_, err := s.store.GetOrderByAppAndNumber(appid, preorder.Number)
+	// check IsNotFound(err)
+	if err == nil {
+		return nil, ErrOrderNumberExits
+	}
+
+	// if method is not empty, we should check first
+	if method != "" && !s.IsSupportedPayType(method) {
+		return nil, ErrUnsupportedPayMethod
+	}
+
+	// check the max pendding order (should with app) ?
+
+	// if method is empty, choose a available one
+
+	// get current waitting pay price with all agents<bind with app>
+	// select * from order where status == ? AND agent_uid in (select uid from app_agent where app_id == ?)
+	ords, err := s.store.GetOrdersByApp(appid, core.OrderStatusPending)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = ords
+
+	// ok, let's generate the key, first search agent by appid
 	// generate the <agent>-<type>-<price>
+	
+	// check which one is not exits
+
+	// TODO: 
+
 	return nil, nil
 }
 

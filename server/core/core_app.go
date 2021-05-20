@@ -30,5 +30,9 @@ type App struct {
 	Secret      string `json:"secret,omitempty" yaml:"secret"`             // secret for app
 	AESKey      string `json:"aes_key,omitempty" yaml:"aes_key"`           // aes key for data encode
 
+	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents,omitempty" yaml:"agents"`
+
 	// belong to user
 }
+
+// TODO: customize AppAgent struct add Model<CreateAt> field

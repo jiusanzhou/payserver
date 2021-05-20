@@ -44,7 +44,8 @@ type OrderStore interface {
 	UpdateOrder(*core.PayRecord) (*core.PayRecord, error)
 	DeleteOrder(id string) error
 	GetOrder(id string) (*core.Order, error)
-	GetOrderByOID(oid string) (*core.Order, error)
+	GetOrderByAppAndNumber(appid string, num string) (*core.Order, error)
+	GetOrdersByApp(appid string, statuss ...core.OrderStatus) ([]*core.Order, error)
 }
 
 type RecordStore interface {

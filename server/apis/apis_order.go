@@ -31,8 +31,10 @@ func (wa *WebAPI) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: auto invaild, check field
 
+	rq := r.URL.Query()
+
 	// take app id
-	var appid = mux.Vars(r)["appid"]
+	var appid = rq.Get("appid")
 	if appid == "" {
 		wr.WithCode(100).WithErrorf("appid can't be empty").Flush()
 		return
@@ -50,12 +52,12 @@ func (wa *WebAPI) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 		wr.WithCode(102).WithErrorf("order price should greater than 0").Flush()
 	}
 
-	// check pre order
+	// check pre order: number can't be empty
 	if preOrder.Number == "" {
 		wr.WithCode(103).WithErrorf("order number can't be empty").Flush()
 	}
 
-	wr.WithDataOrErr(wa.CreateOrder(appid, &preOrder)).Flush()
+	wr.WithDataOrErr(wa.CreateOrder(appid, rq.Get("method"), &preOrder)).Flush()
 }
 
 func (wa *WebAPI) HandleGetOrder(w http.ResponseWriter, r *http.Request) {

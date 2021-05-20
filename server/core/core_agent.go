@@ -58,3 +58,5 @@ type Agent struct {
 
 	// Provider bind to device provider user
 }
+
+// bind agent<find by user first> with app

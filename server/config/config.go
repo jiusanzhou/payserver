@@ -16,7 +16,9 @@
 
 package config
 
-import "go.zoe.im/payserver/server/core"
+import (
+	"go.zoe.im/payserver/server/core"
+)
 
 type Config struct {
 	Addr            string `json:"addr,omitempty" yaml:"addr"`
@@ -30,13 +32,18 @@ type Config struct {
 
 	// default price floor and ceil
 	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"` // -
-	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"` // +
+	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`   // +
 
-	// max pendding ???
+	// order expire duration in second
+	ExpireIn int `json:"expire_in,omitempty" yaml:"expire_in"`
+
+	// max pendding for register, creatting limited
 	MaxPenddingAgent int `json:"max_pendding_agent,omitempty" yaml:"max_pendding_agent"`
 
 	// app can be created by api, TODO: should bind for user
 	Apps []core.App `opts:"-" json:"apps,omitempty" yaml:"apps"`
+
+	// TODO: limit requests
 }
 
 func NewConfig() *Config {

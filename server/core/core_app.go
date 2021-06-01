@@ -32,7 +32,9 @@ type App struct {
 
 	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents,omitempty" yaml:"agents"`
 
-	// belong to user
+	// TODO: belong to user 
+	UserUID string `json:"user_uid,omitempty" yaml:"user_uid"`
+	User    *User  `gorm:"foreignKey:UserUID" json:"user,omitempty" yaml:"user"`
 }
 
 // TODO: customize AppAgent struct add Model<CreateAt> field

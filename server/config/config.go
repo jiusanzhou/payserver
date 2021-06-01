@@ -23,20 +23,27 @@ type Config struct {
 	DB              string `json:"db,omitempty" yaml:"db"`
 	Debug           bool   `json:"debug,omitempty" yaml:"debug"`
 	HTTPAllowOrigin string `json:"http_allow_origin,omitempty" yaml:"http_allow_origin"`
-	Name            string `json:"name,omitempty" yaml:"name"`
 
-	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"`
-	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`
+	// only for client/agent to register
+	Name string `json:"name,omitempty" yaml:"name"`
+	Host string `json:"host,omitempty" yaml:"host"`
 
+	// default price floor and ceil
+	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"` // -
+	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"` // +
+
+	// max pendding ???
 	MaxPenddingAgent int `json:"max_pendding_agent,omitempty" yaml:"max_pendding_agent"`
 
-	// app can be created by api
+	// app can be created by api, TODO: should bind for user
 	Apps []core.App `opts:"-" json:"apps,omitempty" yaml:"apps"`
 }
 
 func NewConfig() *Config {
 	return &Config{
 		Addr:       ":30911",
-		PriceFloor: 20,
+		PriceFloor: 20, // -0.01 - -0.2 (amost 20)
+
+		Name: "官方云",
 	}
 }

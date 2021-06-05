@@ -6,8 +6,8 @@ import 'package:agent/models/models_test.dart';
 import 'package:agent/models/server.dart';
 import 'package:agent/models/transaction.dart';
 import 'package:agent/store/database.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
-import 'package:synchronized/synchronized.dart';
 
 class ModelFactory {
 
@@ -57,7 +57,22 @@ class ModelFactory {
     PayTransaction tran;
     try {tran = PayTransaction.fromEvent(evt);} catch (e) {
       // debug just for
-      tran = genTransaction(PayType.WeChat, 0.01);
+      if (evt.packageName == "com.tencent.mm" && evt.title == "周筱鲁") {
+        try {
+          var parts = (evt.text.split("]")[1] ?? "").split(":");
+          if (parts[0] == "周筱鲁") {
+            parts = parts[1].split(" ");
+            var v = double.parse(parts[2]);
+            if (parts[1] == "支付宝") {
+              tran = genTransaction(PayType.Alipay, v);
+            } else if (parts[1] == "微信") {
+              tran = genTransaction(PayType.WeChat, v);
+            }
+          }
+        } catch(e) {
+          print("manual create transaction error: $e");
+        }
+      }
     }
 
     if (tran == null) return;

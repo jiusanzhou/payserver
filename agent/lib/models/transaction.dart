@@ -202,9 +202,9 @@ class PayTransactionModel extends ChangeNotifier {
     ).then((value) => _todayAmount = value);
   }
 
-  insertTrans(PayTransaction tran, { bool onlyUI = false, bool onlyStore = false }) async {
+  insertTrans(PayTransaction tran, { bool disableUI = false, bool disableStore = false }) async {
     // maybe we should insert first and save to db later
-    if (!onlyStore) {
+    if (!disableUI) {
       _trans.insert(0, tran);
 
       _total++;
@@ -218,7 +218,7 @@ class PayTransactionModel extends ChangeNotifier {
       return Future.value(null);
     }
 
-    if (!onlyUI) {
+    if (!disableStore) {
 
       print("insert a transaction to store: $tran");
       // save to the db first, and save to remote

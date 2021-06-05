@@ -13,20 +13,27 @@ class ModelFactory {
 
   PayTransactionModel trans;
   ServerModel servr;
+  bool inited = false;
+  ReceivePort port = ReceivePort();
 
-  static Lock _lock = Lock();
-  static ModelFactory _instance;
+  static final ModelFactory _instance = ModelFactory._();
   
-  static ReceivePort port = ReceivePort();
-
   static ModelFactory get instance => _instance;
 
-  ModelFactory() {
+  factory ModelFactory() {
+    return _instance;
+  }
+
+  ModelFactory._() {
     trans = PayTransactionModel(db: DBProvider.instance);
     servr = ServerModel(db: DBProvider.instance);
   }
 
   init() async {
+    // TODO: use lock
+    if (inited) return;
+    inited = true;
+
 
     await trans.init();
     await servr.init();
@@ -37,19 +44,12 @@ class ModelFactory {
     IsolateNameServer.registerPortWithName(port.sendPort, "_listener_");
 
     // notify the ui
-    port.listen((msg) => trans.insertTrans(msg as PayTransaction, onlyUI: true));
+    port.listen((msg) => {
+      trans.insertTrans(msg as PayTransaction, disableStore: true)
+    });
 
     // init listener service: fix bug can't return
     NotificationsListener.initialize(callbackHandle: _evtCallback);
-  }
-
-  static Future<ModelFactory> get() async {
-    if (_instance != null) return _instance;
-    await _lock.synchronized(() {
-      _instance = ModelFactory();
-      _instance.init();
-    });
-    return _instance;
   }
 
   static void _evtCallback(NotificationEvent evt) async {
@@ -68,6 +68,6 @@ class ModelFactory {
     send?.send(tran);
 
     // insert to the database
-    (await ModelFactory.get()).trans.insertTrans(tran, onlyStore: true);
+    ModelFactory().trans.insertTrans(tran, disableUI: true);
   }
 }

@@ -61,8 +61,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     return SplashView(
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => ModelFactory.instance.servr),
-          ChangeNotifierProvider(create: (_) => ModelFactory.instance.trans),
+          ChangeNotifierProvider(create: (_) => ModelFactory().servr),
+          ChangeNotifierProvider(create: (_) => ModelFactory().trans),
         ],
         builder: (context, child) => MaterialApp(
           title: "易付",
@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       builder: (context) => Image.asset("assets/logos/main.png", width: 50, height: 50).centered().box.white.make(),
       initItems: [
         DBProvider.instance.database,
-        ModelFactory.get(),
+        ModelFactory.instance.init(),
         Future.delayed(Duration(seconds: 1)),
       ],
     );

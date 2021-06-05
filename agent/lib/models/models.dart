@@ -52,28 +52,33 @@ class ModelFactory {
     NotificationsListener.initialize(callbackHandle: _evtCallback);
   }
 
-  static void _evtCallback(NotificationEvent evt) async {
-    print("send evt to ui from _evtCallback: $evt");
+  static PayTransaction genManualTransaction(NotificationEvent evt) {
     PayTransaction tran;
-    try {tran = PayTransaction.fromEvent(evt);} catch (e) {
-      // debug just for
-      if (evt.packageName == "com.tencent.mm" && evt.title == "周筱鲁") {
-        try {
-          var parts = (evt.text.split("]")[1] ?? "").split(":");
-          if (parts[0] == "周筱鲁") {
-            parts = parts[1].split(" ");
-            var v = double.parse(parts[2]);
-            if (parts[1] == "支付宝") {
-              tran = genTransaction(PayType.Alipay, v);
-            } else if (parts[1] == "微信") {
-              tran = genTransaction(PayType.WeChat, v);
-            }
+    // debug just for
+    if (evt.packageName == "com.tencent.mm" && evt.title == "周筱鲁") {
+      try {
+        var parts = (evt.text.split("]")[1] ?? "").split(":");
+        if (parts[0] == "周筱鲁") {
+          parts = parts[1].split(" ");
+          var v = double.parse(parts[2]);
+          if (parts[1] == "支付宝") {
+            tran = genTransaction(PayType.Alipay, v);
+          } else if (parts[1] == "微信") {
+            tran = genTransaction(PayType.WeChat, v);
           }
-        } catch(e) {
-          print("manual create transaction error: $e");
         }
+      } catch(e) {
+        
       }
     }
+    
+    return tran;
+  }
+
+  static void _evtCallback(NotificationEvent evt) async {
+    print("process evt from _evtCallback: $evt");
+    PayTransaction tran;
+    tran = PayTransaction.fromEvent(evt) ?? genManualTransaction(evt);
 
     if (tran == null) return;
 

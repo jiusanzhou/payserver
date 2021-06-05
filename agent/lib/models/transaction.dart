@@ -79,7 +79,7 @@ class PayTransaction {
       raw: evt.toString(),
     );
 
-    assert(evt.text != null || evt.title != null);
+    if (evt.text == null || evt.title == null) return null;
 
     // panic, maybe we need to ignore this?
     // assert(_this.type != PayType.Unknown);
@@ -89,18 +89,18 @@ class PayTransaction {
     // add more for other
     switch (_this.type) {
       case PayType.Alipay:
-        assert(evt.text.contains("已转入余额"));
+        if (!evt.text.contains("已转入余额")) return null;
         _this.value = parseCount(evt.title);
         break;
       case PayType.WeChat:
-        assert(evt.title == "微信支付" && evt.text.contains("微信支付收款"));
+        if (evt.title != "微信支付" || !evt.text.contains("微信支付收款")) return null;
         _this.value = parseCount(evt.text);
         break;
       default:
     }
 
     // value can't be null
-    assert(_this.value != null);
+    if (_this.value == null) return null;
 
     // parse from
     _this.amount = (double.parse(_this.value) * 100).round(); // 0.01 => 1

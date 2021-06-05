@@ -93,7 +93,7 @@ class PayTransaction {
         _this.value = parseCount(evt.title);
         break;
       case PayType.WeChat:
-        assert(evt.title == "微信支付");
+        assert(evt.title == "微信支付" && evt.text.contains("微信支付收款"));
         _this.value = parseCount(evt.text);
         break;
       default:

@@ -34,8 +34,10 @@ type Config struct {
 	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"` // -
 	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`   // +
 
+	// default configuraton for app
 	// order expire duration in second
-	ExpireIn int `json:"expire_in,omitempty" yaml:"expire_in"`
+	ExpireIn         int `json:"expire_in,omitempty" yaml:"expire_in"`
+	MaxPenddingOrder int `json:"max_pendding_order,omitempty" yaml:"max_pendding_order"`
 
 	// max pendding for register, creatting limited
 	MaxPenddingAgent int `json:"max_pendding_agent,omitempty" yaml:"max_pendding_agent"`

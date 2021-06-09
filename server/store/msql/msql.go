@@ -39,6 +39,7 @@ var _ store.Storage = (*driver)(nil)
 var DBConn *gorm.DB
 
 type driver struct {
+	// TODO: should with cache
 	*gorm.DB // The main db object
 
 	c *store.Config

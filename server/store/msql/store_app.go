@@ -14,38 +14,11 @@
  * limitations under the License.
  */
 
-package server
+package msql
 
-import (
-	"sync"
+import "go.zoe.im/payserver/server/core"
 
-	"go.zoe.im/payserver/server/config"
-	"go.zoe.im/payserver/server/store"
-)
-
-type Server struct {
-	store store.Storage
-
-	// unique the pay id
-	uniqueIDs map[string]bool
-	sync.RWMutex
-
-	c     *config.Config
-}
-
-func (s *Server) Name() string {
-	// TODO:
-	return s.c.Name
-}
-
-func New(c *config.Config, store store.Storage) *Server {
-	s := &Server{
-		store: store,
-		uniqueIDs: make(map[string]bool),
-		c:     c,
-	}
-
-	// TODO: init load from db
-
-	return s
+func (d driver) GetApp(id string) (*core.App, error) {
+	var app core.App
+	return &app, d.Where("uid = ? AND delete_at == null", id).First(&app).Error
 }

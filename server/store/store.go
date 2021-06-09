@@ -24,11 +24,16 @@ import (
 	"go.zoe.im/payserver/server/core"
 )
 
+var (
+	ErrMissObjectID = errors.New("miss object id")
+)
+
 // Storage for storage
 type Storage interface {
 	AgentStore
 	OrderStore
 	RecordStore
+	AppStore
 }
 
 type AgentStore interface {
@@ -41,7 +46,7 @@ type AgentStore interface {
 
 type OrderStore interface {
 	CreateOrder(*core.Order) (*core.Order, error)
-	UpdateOrder(*core.PayRecord) (*core.PayRecord, error)
+	UpdateOrder(*core.Order) (*core.Order, error)
 	DeleteOrder(id string) error
 	GetOrder(id string) (*core.Order, error)
 	GetOrderByAppAndNumber(appid string, num string) (*core.Order, error)
@@ -52,6 +57,10 @@ type RecordStore interface {
 	CreateRecord(*core.PayRecord) (*core.PayRecord, error)
 	UpdateRecord(*core.PayRecord) (*core.PayRecord, error)
 	DeleteRecord(id string) error
+}
+
+type AppStore interface {
+	GetApp(id string) (*core.App, error)
 }
 
 // ===========================================================

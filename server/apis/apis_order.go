@@ -27,7 +27,7 @@ import (
 
 func (wa *WebAPI) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
 	// TODO: auto invaild, check field
 
@@ -43,55 +43,60 @@ func (wa *WebAPI) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	// marshal preorder from body
 	var preOrder core.PreOrder
 	if err := json.NewDecoder(r.Body).Decode(&preOrder); err != nil {
-		wr.WithCode(101).WithErrorf("decode order error: %s", err).Flush()
+		wr.WithCode(101).WithErrorf("decode order error: %s", err)
 		return
 	}
 
 	// check price
 	if preOrder.Price <= 0 {
-		wr.WithCode(102).WithErrorf("order price should greater than 0").Flush()
+		wr.WithCode(102).WithErrorf("order price must greatter than 0")
+		return
 	}
 
 	// check pre order: number can't be empty
 	if preOrder.Number == "" {
-		wr.WithCode(103).WithErrorf("order number can't be empty").Flush()
+		wr.WithCode(103).WithErrorf("order number can't be empty")
+		return
 	}
 
-	wr.WithDataOrErr(wa.CreateOrder(appid, rq.Get("method"), &preOrder)).Flush()
+	wr.WithDataOrErr(wa.CreateOrder(appid, rq.Get("method"), &preOrder))
 }
 
 func (wa *WebAPI) HandleGetOrder(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
+	defer wr.Flush()
 
-	var uid = mux.Vars(r)["uid"]
+	var uid = mux.Vars(r)["id"]
 	if uid == "" {
-		wr.WithCode(200).WithErrorf("order id can't be empty").Flush()
+		wr.WithCode(200).WithErrorf("order id can't be empty")
 		return
 	}
 
-	wr.WithDataOrErr(wa.GetOrder(uid)).Flush()
+	wr.WithDataOrErr(wa.GetOrder(uid))
 }
 
 func (wa *WebAPI) HandleGetOrderStatus(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
+	defer wr.Flush()
 
-	var uid = mux.Vars(r)["uid"]
+	var uid = mux.Vars(r)["id"]
 	if uid == "" {
-		wr.WithCode(200).WithErrorf("order id can't be empty").Flush()
+		wr.WithCode(200).WithErrorf("order id can't be empty")
 		return
 	}
 
-	wr.WithDataOrErr(wa.GetOrderStatus(uid)).Flush()
+	wr.WithDataOrErr(wa.GetOrderStatus(uid))
 }
 
 func (wa *WebAPI) HandleCancelOrder(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
+	defer wr.Flush()
 
-	var uid = mux.Vars(r)["uid"]
+	var uid = mux.Vars(r)["id"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("order id can't be empty").Flush()
 		return
 	}
 
-	wr.WithDataOrErr(wa.CancelOrder(uid)).Flush()
+	wr.WithDataOrErr(wa.CancelOrder(uid))
 }

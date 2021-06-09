@@ -14,38 +14,19 @@
  * limitations under the License.
  */
 
-package server
+package utils
 
-import (
-	"sync"
-
-	"go.zoe.im/payserver/server/config"
-	"go.zoe.im/payserver/server/store"
-)
-
-type Server struct {
-	store store.Storage
-
-	// unique the pay id
-	uniqueIDs map[string]bool
-	sync.RWMutex
-
-	c     *config.Config
-}
-
-func (s *Server) Name() string {
-	// TODO:
-	return s.c.Name
-}
-
-func New(c *config.Config, store store.Storage) *Server {
-	s := &Server{
-		store: store,
-		uniqueIDs: make(map[string]bool),
-		c:     c,
+// GenPriceFloats TODO: make order method wit arg
+// 0, -1, -2, 1, 2
+// 0, 1, 2, -1, -2
+func GenPriceFloats(floor, ceil int) []int {
+	floats := make([]int, 1 + floor + ceil)
+	floats[0] = 0
+	for i := 1; i <= floor; i++ {
+		floats[i] = -1 * i
 	}
-
-	// TODO: init load from db
-
-	return s
+	for i := 1; i <= ceil; i++ {
+		floats[floor+i] = i
+	}
+	return floats
 }

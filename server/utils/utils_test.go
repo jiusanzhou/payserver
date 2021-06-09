@@ -14,38 +14,41 @@
  * limitations under the License.
  */
 
-package server
+package utils
 
 import (
-	"sync"
-
-	"go.zoe.im/payserver/server/config"
-	"go.zoe.im/payserver/server/store"
+	"reflect"
+	"testing"
 )
 
-type Server struct {
-	store store.Storage
-
-	// unique the pay id
-	uniqueIDs map[string]bool
-	sync.RWMutex
-
-	c     *config.Config
-}
-
-func (s *Server) Name() string {
-	// TODO:
-	return s.c.Name
-}
-
-func New(c *config.Config, store store.Storage) *Server {
-	s := &Server{
-		store: store,
-		uniqueIDs: make(map[string]bool),
-		c:     c,
+func TestGenPriceFloats(t *testing.T) {
+	type args struct {
+		floor int
+		ceil  int
 	}
-
-	// TODO: init load from db
-
-	return s
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{
+			"Simple", args{0, 0}, []int{0},
+		},
+		{
+			"Simple 2", args{1, 0}, []int{0, -1},
+		},
+		{
+			"Simple 3", args{0, 1}, []int{0, 1},
+		},
+		{
+			"Simple 4", args{1, 1}, []int{0, -1, 1},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GenPriceFloats(tt.args.floor, tt.args.ceil); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenPriceFloats() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

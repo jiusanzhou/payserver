@@ -25,11 +25,12 @@ const (
 	AgentStatusOffline
 	AgentStatusDisable
 	AgentStatusPendding
+	AgentStatusBusy
 	AgentStatusUnknown
 )
 
 var (
-	_AgentStatusStrings = []string{"normal", "offline", "disable", "pendding", "unknown"}
+	_AgentStatusStrings = []string{"normal", "offline", "disable", "pendding", "busy", "unknown"}
 )
 
 func (o AgentStatus) String() string {

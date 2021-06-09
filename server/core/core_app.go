@@ -23,16 +23,20 @@ type App struct {
 	Name        string `json:"name,omitempty" yaml:"name"`               // app name
 	Description string `json:"description,omitempty" yaml:"description"` // description
 
-	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"` // price can be decrease to, default 100
-	PriceCeil  int `json:"price_ceil,omitempty" yaml:"price_ceil"`   // price can be increase to, default 0
-
 	CallbackURL string `json:"callback_url,omitempty" yaml:"callback_url"` // notify the app server
 	Secret      string `json:"secret,omitempty" yaml:"secret"`             // secret for app
 	AESKey      string `json:"aes_key,omitempty" yaml:"aes_key"`           // aes key for data encode
 
+	// Configuration for app
+	PriceFloor       int `json:"price_floor,omitempty" yaml:"price_floor"` // price can be decrease to, default 100
+	PriceCeil        int `json:"price_ceil,omitempty" yaml:"price_ceil"`   // price can be increase to, default 0
+	ExpireIn         int `json:"expire_in,omitempty" yaml:"expire_in"`
+	MaxPenddingOrder int `json:"max_pendding_order,omitempty" yaml:"max_pendding_order"`
+
+	// TODO: with weight?
 	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents,omitempty" yaml:"agents"`
 
-	// TODO: belong to user 
+	// TODO: belong to user
 	UserUID string `json:"user_uid,omitempty" yaml:"user_uid"`
 	User    *User  `gorm:"foreignKey:UserUID" json:"user,omitempty" yaml:"user"`
 }

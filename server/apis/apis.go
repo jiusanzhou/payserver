@@ -34,8 +34,8 @@ func (wa *WebAPI) Register(apiv1 *mux.Router) {
 	apiv1.HandleFunc("/order/{uid}/cancel", wa.HandleCancelOrder).Methods("POST") // TODO???
 	apiv1.HandleFunc("/order/{uid}/status", wa.HandleGetOrderStatus).Methods("GET")
 
-	// apiv1.HandleFunc("/records", wa.HandleCreateRecord).Methods("POST")
-	// apiv1.HandleFunc("/record/{uid}", wa.HandleGetRecord).Methods("GET")
+	apiv1.HandleFunc("/records", wa.HandleCreateRecord).Methods("POST")
+	apiv1.HandleFunc("/record/{uid}", wa.HandleGetRecord).Methods("GET")
 	// apiv1.HandleFunc("/records", wa.HandleListRecords).Methods("GET")
 
 	// apiv1.HandleFunc("/agent/prepare", wa.HandlePrepareAgent).Methods("GET")

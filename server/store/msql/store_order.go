@@ -34,17 +34,17 @@ func (d driver) UpdateOrder(or *core.Order) (*core.Order, error) {
 	return or, d.Model(or).Where("uid = ?", or.UID).Updates(or).Error
 }
 
-func (d driver) DeleteOrder(id string) error {
-	if id == "" {
+func (d driver) DeleteOrder(uid string) error {
+	if uid == "" {
 		return store.ErrMissObjectID
 	}
 
-	return d.Where("uid = ?", id).Delete(&core.Order{}).Error
+	return d.Where("uid = ?", uid).Delete(&core.Order{}).Error
 }
 
-func (d driver) GetOrder(id string) (*core.Order, error) {
+func (d driver) GetOrder(uid string) (*core.Order, error) {
 	var or core.Order
-	return &or, d.Where("uid = ? AND delete_at == null", id).First(&or).Error
+	return &or, d.Where("uid = ? AND delete_at == null", uid).First(&or).Error
 }
 
 func (d driver) GetOrderByAppAndNumber(appid string, num string) (*core.Order, error) {

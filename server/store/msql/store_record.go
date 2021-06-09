@@ -21,17 +21,28 @@ import (
 	"go.zoe.im/payserver/server/store"
 )
 
-func (d driver) CreateRecord(*core.PayRecord) (*core.PayRecord, error) {
-
-	return nil, store.ErrNoImplement
+func (d driver) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
+	return rd, d.Create(rd).Error
 }
 
-func (d driver) UpdateRecord(*core.PayRecord) (*core.PayRecord, error) {
-
-	return nil, store.ErrNoImplement
+func (d driver) GetRecord(uid string) (*core.PayRecord, error) {
+	var rd core.PayRecord
+	return &rd, d.Where("uid = ? AND delete_at == null", uid).First(&rd).Error
 }
 
-func (d driver) DeleteRecord(id string) error {
+func (d driver) UpdateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
+	// must with uid
+	if rd.UID == "" {
+		return nil, store.ErrMissObjectID
+	}
 
-	return store.ErrNoImplement
+	return rd, d.Model(rd).Where("uid = ?", rd.UID).Updates(rd).Error
+}
+
+func (d driver) DeleteRecord(uid string) error {
+	if uid == "" {
+		return store.ErrMissObjectID
+	}
+
+	return d.Where("uid = ?", uid).Delete(&core.PayRecord{}).Error
 }

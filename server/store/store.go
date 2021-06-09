@@ -56,6 +56,7 @@ type OrderStore interface {
 type RecordStore interface {
 	CreateRecord(*core.PayRecord) (*core.PayRecord, error)
 	UpdateRecord(*core.PayRecord) (*core.PayRecord, error)
+	GetRecord(id string) (*core.PayRecord, error)
 	DeleteRecord(id string) error
 }
 

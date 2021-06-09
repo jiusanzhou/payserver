@@ -17,28 +17,50 @@
 package apis
 
 import (
+	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
+	"go.zoe.im/payserver/server/core"
 	"go.zoe.im/x/httputil"
 )
 
+// Record means PayRecord alse named Transaction
+
 func (wa *WebAPI) HandleCreateRecord(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
-	wr.Flush()
+	var rd core.PayRecord
+	if err := json.NewDecoder(r.Body).Decode(&rd); err != nil {
+		wr.WithCode(101).WithErrorf("decode record error: %s", err)
+		return
+	}
+
+	// should we invial the data?
+
+	// ok, let's just save it
+	wr.WithDataOrErr(wa.CreateRecord(&rd))
 }
 
 func (wa *WebAPI) HandleGetRecord(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
-	wr.Flush()
+	var uid = mux.Vars(r)["id"]
+	if uid == "" {
+		wr.WithCode(200).WithErrorf("record id can't be empty")
+		return
+	}
+
+	wr.WithDataOrErr(wa.GetRecord(uid))
 }
 
 func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
-	wr.Flush()
 }
+
+
+// won't privder delete

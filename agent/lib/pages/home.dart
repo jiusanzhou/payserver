@@ -5,13 +5,13 @@
 
 
 import 'package:agent/models/server.dart';
-import 'package:agent/models/models_test.dart';
 import 'package:agent/styles/colors.dart';
 import 'package:agent/views/panel.dart';
 import 'package:agent/views/server_list.dart';
 import 'package:agent/views/trans_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoekits/flutter_zoekits.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,8 +23,6 @@ class HomePage extends StatefulWidget {
 // transaction list
 
 class _HomePageState extends State<HomePage> {
-
-  var currentServer = genServer("官方云");
 
   Color _genStatusColor(ServerStatus status) {
     final _colors = <ServerStatus, Color> {
@@ -50,17 +48,19 @@ class _HomePageState extends State<HomePage> {
                 // title: Text("易付"),
                 // centerTitle: true,
                 title: VxBox(
-                  child: [
-                    VxBox().size(10, 10)
-                      .color(_genStatusColor(currentServer.status))
-                      .roundedFull.margin(Vx.mH8).make(),
-                    "易付 • ${currentServer.name}".text.bold.gray900.maxFontSize(14).make(),
-                    Icon(Icons.chevron_right, color: Vx.gray600),
-                  ].hStack()
+                  child: Consumer<ServerModel>(
+                    builder: (context, model, child) =>[
+                      VxBox().size(10, 10)
+                          .color(_genStatusColor(model.currentServer.status))
+                          .roundedFull.margin(Vx.mH8).make(),
+                      "易付 • ${model.currentServer.name}".text.bold.gray900.maxFontSize(14).make(), 
+                      Icon(Icons.chevron_right, color: Vx.gray600),
+                    ].hStack()
+                  ),
                 ).white.withRounded(value: 100).p8.make()
                   .onInkTap(() {
                     ZBottomSheet(
-                      ServerList().box.height(420).make(),
+                      ServerList(viewMode: true).box.height(420).make(),
                       cancel: "取消".text.make(),
                       onCancel: () => true,
                       actions: [
@@ -76,13 +76,12 @@ class _HomePageState extends State<HomePage> {
                     ).showModal(context);
                   }),
                 actions: [
-                    IconButton(icon: Icon(Icons.analytics), onPressed: () => Navigator.pushNamed(context, "/analytics")),
-                    IconButton(icon: Icon(Icons.settings), onPressed: () => Navigator.pushNamed(context, "/settings"))
+                  Icons.analytics.onPress(() => Navigator.pushNamed(context, "/analytics")),
+                  Icons.settings.onPress(() => Navigator.pushNamed(context, "/settings")),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   collapseMode: CollapseMode.pin,
-                  background: Fn.withBackground(
-                    child: StatePanel(),
+                  background: StatePanel().withZBackground(
                     color: Colours.primaryColor2,
                     imageUrl: "assets/images/flat-mountains.png",
                     radiusArray: [0, 0, 20, 20],
@@ -94,6 +93,6 @@ class _HomePageState extends State<HomePage> {
         },
         body: TransList().box.margin(Vx.mOnly(top: 84)).make(),
       ),
-    );
+    ).willPop(onPop: () => VxToast.show(context, msg: "再按一次退出"));
   }
 }

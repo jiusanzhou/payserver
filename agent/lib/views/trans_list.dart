@@ -37,21 +37,15 @@ class _TransListState extends State<TransList> {
               var _item = item as PayTransaction;
               // TextButton(onPressed: , child: child)
               return ListTile(
-                onTap: () => {},
+                // onTap: () => {},
                 leading: ClipOval(
-                  child: Image.asset(
-                    "assets/logos/${_item.type.text}.png",
-                    width: logoSize, height: logoSize,
-                    fit: BoxFit.cover,
-                  ),
+                  child: "assets/logos/${_item.type.text}.png".image(size: logoSize),
                 ),
                 title: "${_item.type.name}收款".text.make(),
                 subtitle: _item.createAt.toString().split(".")[0].text.make(),
                 // Icon(Icons.check, color: Colors.green),
                 trailing: "+ ${_item.value}".text.color(Theme.of(context).primaryColor).size(18).bold.make()
-              ).onInkTap(() {
-                print("点击了");
-              });
+              );
             },
             separator: VxBox().height(1).color(Colours.bgLight).make().px16(),
           ).expand(),

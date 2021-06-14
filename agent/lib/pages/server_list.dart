@@ -24,7 +24,7 @@ class _ServerListPageState extends State<ServerListPage> {
           )
         ],
       ),
-      body: ServerList(),
+      body: ServerList(viewMode: false),
     );
   }
 }

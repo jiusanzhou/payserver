@@ -31,6 +31,7 @@ dependencies:
 
   velocity_x: ^3.2.0
   qr_code_scanner: ^0.4.0
+  qr_flutter: ^4.0.0
   workmanager: ^0.4.0 # flutter_background_fetch
   sqflite: ^2.0.0+3
   path_provider: ^2.0.2 # ---
@@ -39,6 +40,7 @@ dependencies:
   provider: ^5.0.0
   shared_preferences: ^2.0.6
   synchronized: ^3.0.0
+  flutter_form_builder: ^6.0.1
 
   flutter_notification_listener:
     path: ../../../labs.zoe.im/flutter_notification_listener

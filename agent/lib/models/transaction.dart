@@ -186,6 +186,7 @@ class PayTransactionModel extends ChangeNotifier {
   PayTransactionModel({@required this.db});
 
   init() async {
+    print("refresh transactions model");
     // await loadMoreAllTrans();
     await db.countTrans().then((value) => _total = value);
 
@@ -200,6 +201,8 @@ class PayTransactionModel extends ChangeNotifier {
       from: DateTime(now.year, now.month, now.day, 0),
       to: DateTime(now.year, now.month, now.day+1, 0),
     ).then((value) => _todayAmount = value);
+
+    notifyListeners();
   }
 
   insertTrans(PayTransaction tran, { bool disableUI = false, bool disableStore = false }) async {
@@ -219,9 +222,9 @@ class PayTransactionModel extends ChangeNotifier {
     }
 
     if (!disableStore) {
-
       print("insert a transaction to store: $tran");
       // save to the db first, and save to remote
+      // TODO: post to remote
       // TODO: send to remote notify and update transaction status.
       return db.insertTrans(tran);
     }

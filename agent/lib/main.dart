@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:agent/models/models.dart';
-import 'package:agent/models/server.dart';
-import 'package:agent/models/transaction.dart';
+import 'package:agent/pages/about.dart';
 import 'package:agent/pages/confirm.dart';
+import 'package:agent/pages/debug.dart';
 import 'package:agent/pages/scan.dart';
 import 'package:agent/pages/server_list.dart';
+import 'package:agent/pages/server_profile.dart';
 import 'package:agent/store/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,6 @@ import 'package:agent/pages/analytics.dart';
 import 'package:agent/pages/home.dart';
 import 'package:agent/pages/settings.dart';
 import 'package:agent/styles/colors.dart';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 
 import 'package:flutter_zoekits/flutter_zoekits.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +46,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print(state.toString());
+    if (state == AppLifecycleState.resumed) {
+      // refresh model
+      ModelFactory().trans.init();
+    }
   }
 
   @override
@@ -73,19 +77,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           onGenerateRoute: buildRouteGenerater({
             "/": ZRouter((context) => HomePage()),
             "/servers": ZRouter((context) => ServerListPage()),
+            "/server-profile": ZRouter((context) => ServerProfilePage()),
             "/settings": ZRouter((context) => SettingsPage()),
             "/analytics": ZRouter((context) => AnalyticsPage()),
             "/confirm": ZRouter((context) => ConfirmPage()),
             "/scan": ZRouter((context) => ScanPage()),
+            "/about": ZRouter((context) => AboutPage()),
+            "/test": ZRouter((context) => DebugPage()),
           }),
         ),
       ),
       // build the splash
-      builder: (context) => Image.asset("assets/logos/main.png", width: 50, height: 50).centered().box.white.make(),
+      builder: (context) => ZLogo(src: "assets/logos/main.png").centered().box.white.make(),
       initItems: [
         DBProvider.instance.database,
         ModelFactory.instance.init(),
-        Future.delayed(Duration(seconds: 1)),
+        ZSharedPreferences.instance.init(),
       ],
     );
   }

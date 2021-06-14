@@ -1,8 +1,11 @@
 
+import 'dart:convert';
+
 import 'package:agent/models/models_test.dart';
 import 'package:agent/models/transaction.dart';
 import 'package:agent/store/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoekits/flutter_zoekits.dart';
 
 enum ServerStatus {
   Normal,
@@ -59,20 +62,27 @@ class Server {
     this.name,
     this.host,
     this.version = "v1",
-    this.types,
-    this.uid,
+    this.types = const [],
+    this.uid = "",
     this.ticket,
     this.status = ServerStatus.Normal,
     this.createAt,
   }) : assert(name != null && host != null && ticket != null);
 
-  factory Server.fromJson(Map<String, dynamic> json) {
-    // TODO:
-    return Server();
+  factory Server.empty() {
+    return Server(
+      name: "", host: "", ticket: "", types: [],
+      createAt: DateTime.now(),
+    );
   }
 
   bool invalid() {
-    return false;
+    return true;
+  }
+
+  @override
+  String toString() {
+    return json.encode(this.toMap());
   }
 
 
@@ -99,13 +109,15 @@ class Server {
       "types": types.map((e) => e.text).join(","),
       "uid": uid,
       "ticket": ticket,
-      "status": status.text,
-      "create_at": createAt.millisecondsSinceEpoch,
+      "status": status?.text,
+      "create_at": createAt?.millisecondsSinceEpoch,
     };
   }
 }
 
 class ServerModel extends ChangeNotifier {
+
+  final _curServerIDKey = "current_server_id";
 
   final DBProvider db;
 
@@ -122,9 +134,52 @@ class ServerModel extends ChangeNotifier {
 
   init() async {
     // TODO: load default from remote config
-    _servers.add(genServer("官方云"));
+
+    _servers.add(genServer(-1, name: "官方云"));
+
+    _currentServer = _servers[0]; // defualt
+
     // must add default server
     // load servers from db
-    return db.queryServers().then((value) => _servers.addAll(value));
+    await db.queryServers().then((value) => _servers.addAll(value));
+
+    // _servers.addAll(List<Server>.generate(4, (index) => genServer(index)));
+
+    // set current with id
+    var xid = ZSharedPreferences.instance.getInt(_curServerIDKey);
+    if (xid == null) return;
+
+    // filter to find the server or default one
+    _currentServer = servers.firstWhere((e) => e.id == xid, orElse: () => _servers[0]);
+  }
+
+  setCurrentServer(Server ser) {
+    _currentServer = ser;
+    notifyListeners();
+    ZSharedPreferences.instance.putInt(_curServerIDKey, ser.id ?? -1);
+  }
+
+  insertServer(Server server) async {
+    // TODO: post to remote, and with error.
+    await db.insertServer(server);
+    servers.add(server);
+    notifyListeners();
+  }
+
+  updateServer(Server server) async {
+    await db.updateServer(server);
+    for (var i = 0; i < servers.length; i++) {
+      if (servers[i].id == server.id) {
+        servers[i] = server;
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
+  deleteServer(Server server) async {
+    await db.deleteServer(server);
+    servers.remove(server);
+    notifyListeners();
   }
 }

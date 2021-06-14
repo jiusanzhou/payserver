@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:agent/models/server.dart';
 import 'package:agent/models/transaction.dart';
+import 'package:agent/pages/server_profile.dart';
 import 'package:agent/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoekits/flutter_zoekits.dart';
@@ -45,9 +46,18 @@ class _ScanPageState extends State<ScanPage> {
           ].hStack(alignment: MainAxisAlignment.start, axisSize: MainAxisSize.max)
             .box.make(),
           [
-            "请扫描服务端生成的注册二维码".text.white.bold.size(18).make(),
-            ZButton(child: "手动填写内容".text.make(), type: ButtonType.Elevated, primary: Colors.teal,
-              onPressed: () => Navigator.of(context).pushNamed("/profile")).box.margin(Vx.mOnly(top: 48)).make()
+            "请扫描服务端生成的注册二维码".text.white.bold.size(16).make(),
+            ZButton(
+              child: "手动填写内容".text.size(14).make(),
+              type: ButtonType.Elevated, primary: Colors.teal,
+              onPressed: () => {
+                Navigator.of(context).pop(),
+                Navigator.of(context).pushNamed(
+                  "/server-profile",
+                  arguments: ServerProfilePageArgs(createMode: true),
+                )
+              })
+              .box.margin(Vx.mOnly(top: 48)).make()
           ].vStack().box.make(),
         ].vStack(
           alignment: MainAxisAlignment.spaceBetween,
@@ -109,11 +119,18 @@ class _ScanPageState extends State<ScanPage> {
       try {
         Map<String, dynamic> res = jsonDecode(str);
         // 检查校验
-        var s = Server.fromJson(res);
-        print("===> 添加服务器 $s");
+        var server = Server.fromMap(res);
         // 跳转到编辑页面
+        Navigator.of(context)
+        .pushNamed(
+          "/server-profile",
+          arguments: ServerProfilePageArgs(
+            createMode: true,
+            server: server,
+          ),
+        );
       } catch (e) {
-
+        print("===> $e");
       }
     });
   }

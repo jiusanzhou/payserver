@@ -1,3 +1,4 @@
+import 'package:agent/models/models_test.dart';
 import 'package:agent/models/server.dart';
 import 'package:agent/models/transaction.dart';
 import 'package:sqflite/sqflite.dart';
@@ -6,7 +7,8 @@ import 'package:path/path.dart';
 class DBProvider {
   DBProvider._();
 
-  static final DBProvider instance = DBProvider._();
+  static final DBProvider _instance = DBProvider._();
+  static DBProvider get instance => _instance;
 
   Database _database;
 
@@ -101,7 +103,9 @@ class DBProvider {
   }
 
   Future<int> insertServer(Server server) async {
-    return await (await database).insert(_TS, server.toMap());
+    var map = server.toMap();
+    map.remove("id");
+    return await (await database).insert(_TS, map);
   }
 
   Future<List<Server>> queryServers() async {
@@ -111,5 +115,9 @@ class DBProvider {
 
   Future<void> deleteServer(Server server) async {
     return await (await database).delete(_TS, where: "id = ?", whereArgs: [server.id]);
+  }
+
+  Future<void> updateServer(Server server) async {
+    return await (await database).update(_TS, server.toMap(), where: "id = ?", whereArgs: [server.id]);
   }
 }

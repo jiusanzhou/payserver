@@ -29,9 +29,10 @@ PayTransaction genTransaction(PayType type, double count) {
   );
 }
 
-Server genServer(String name) {
+Server genServer(int id, { String name }) {
   return Server(
-    name: name,
+    id: id,
+    name: name ?? "服务 $id",
     host: "https://example.com/$name",
     ticket: "xxx",
     types: [PayType.Alipay, PayType.WeChat],

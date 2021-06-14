@@ -93,6 +93,9 @@ class _HomePageState extends State<HomePage> {
         },
         body: TransList().box.margin(Vx.mOnly(top: 84)).make(),
       ),
-    ).willPop(onPop: () => VxToast.show(context, msg: "再按一次退出"));
+    ).willPop(onWillPop: () {
+      VxToast.show(context, msg: "再按一次退出");
+      return Future.value(false);
+    });
   }
 }

@@ -14,32 +14,11 @@
  * limitations under the License.
  */
 
-package main
+package msql
 
-import (
-	"log"
+import "go.zoe.im/payserver/server/core"
 
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+func (d driver) GetApp(id string) (*core.App, error) {
+	var app core.App
+	return &app, d.Where("uid = ? AND delete_at == null", id).First(&app).Error
 }

@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 
-package main
+package core
 
-import (
-	"log"
+type User struct {
+	Model `json:"model,omitempty" yaml:"model"`
 
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+	Account  string `json:"account,omitempty" yaml:"account"`
+	Token    string `json:"token,omitempty" yaml:"token"`
+	IsAdmin  bool   `json:"is_admin,omitempty" yaml:"is_admin"`
+	External string `json:"external,omitempty" yaml:"external"`
 }

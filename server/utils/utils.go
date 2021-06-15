@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package main
+package utils
 
-import (
-	"log"
-
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+// GenPriceFloats TODO: make order method wit arg
+// 0, -1, -2, 1, 2
+// 0, 1, 2, -1, -2
+func GenPriceFloats(floor, ceil int) []int {
+	floats := make([]int, 1 + floor + ceil)
+	floats[0] = 0
+	for i := 1; i <= floor; i++ {
+		floats[i] = -1 * i
 	}
+	for i := 1; i <= ceil; i++ {
+		floats[floor+i] = i
+	}
+	return floats
 }

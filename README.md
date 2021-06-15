@@ -2,6 +2,6 @@
 
 # `payserver`
 
-**A easy way to get pay.**
+**A easy way to get paid.**
 
 </div>

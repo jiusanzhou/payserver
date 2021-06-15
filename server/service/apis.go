@@ -14,32 +14,14 @@
  * limitations under the License.
  */
 
-package main
+package service
 
 import (
-	"log"
-
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
+	"go.zoe.im/x/httputil"
 )
 
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+func init() {
+	httputil.HTTPStatusFromCode(func(_ httputil.StatusCode) int {
+		return 200
+	})
 }

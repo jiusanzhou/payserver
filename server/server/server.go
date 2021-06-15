@@ -14,32 +14,38 @@
  * limitations under the License.
  */
 
-package main
+package server
 
 import (
-	"log"
+	"sync"
 
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
+	"go.zoe.im/payserver/server/config"
+	"go.zoe.im/payserver/server/store"
 )
 
-func main() {
-	svr := service.New()
+type Server struct {
+	store store.Storage
 
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
+	// unique the pay id
+	uniqueIDs map[string]bool
+	sync.RWMutex
 
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+	c     *config.Config
+}
+
+func (s *Server) Name() string {
+	// TODO:
+	return s.c.Name
+}
+
+func New(c *config.Config, store store.Storage) *Server {
+	s := &Server{
+		store: store,
+		uniqueIDs: make(map[string]bool),
+		c:     c,
 	}
+
+	// TODO: init load from db
+
+	return s
 }

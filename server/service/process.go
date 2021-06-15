@@ -14,32 +14,16 @@
  * limitations under the License.
  */
 
-package main
+package service
 
-import (
-	"log"
+// 创建订单
+// 分配余额
 
-	"go.zoe.im/x/cli"
+// 设备(代表账号) + type + 金额 => primary
 
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
+// app 与 设备 多对多
+// app
 
-	_ "go.zoe.im/payserver/server/store/msql"
-)
+// heartbeat for device
 
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
-}
+// user no need!!!

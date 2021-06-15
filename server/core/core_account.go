@@ -14,32 +14,11 @@
  * limitations under the License.
  */
 
-package main
+package core
 
-import (
-	"log"
-
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+// Account define the pay account in device<agent>
+// A agent can have mult pay account
+// TODO: later, add action to scape the account detail information in agent app
+type Account struct {
+	Model
 }

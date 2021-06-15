@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 
-package main
+package core
 
-import (
-	"log"
+type RegisterAgentTicket struct {
+	// server information for api
+	Name    string `json:"name,omitempty" yaml:"name"`
+	Host    string `json:"host,omitempty" yaml:"host"`
+	Version string `json:"version,omitempty" yaml:"version"`
 
-	"go.zoe.im/x/cli"
-
-	"go.zoe.im/payserver/server/cmd"
-	"go.zoe.im/payserver/server/service"
-
-	_ "go.zoe.im/payserver/server/store/msql"
-)
-
-func main() {
-	svr := service.New()
-
-	cmd.Option(
-		cli.GlobalConfig(svr.Config),
-		cli.Run(func(c *cli.Command, args ...string) {
-			if err := svr.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		}),
-	)
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
+	// agent certify
+	UID    string `json:"uid,omitempty" yaml:"uid"` // should't offers? deprecated
+	Ticket string `json:"ticket,omitempty" yaml:"ticket"`
 }

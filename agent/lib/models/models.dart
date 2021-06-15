@@ -6,7 +6,6 @@ import 'package:agent/models/models_test.dart';
 import 'package:agent/models/server.dart';
 import 'package:agent/models/transaction.dart';
 import 'package:agent/store/database.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 
 class ModelFactory {

@@ -1,4 +1,4 @@
-import 'package:agent/models/models_test.dart';
+
 import 'package:agent/models/server.dart';
 import 'package:agent/models/transaction.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,9 +29,9 @@ class DBProvider {
     );
   }
 
-  final String _TT = "transactions";
-  final String _TS = "servers";
-  final String _TO = "orders";
+  static const String _TT = "transactions";
+  static const String _TS = "servers";
+  // static const String _TO = "orders";
 
   void _onCreate(Database db, int version) async {
     await db.execute(

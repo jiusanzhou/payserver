@@ -6,9 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:agent/models/server.dart';
-import 'package:agent/models/transaction.dart';
 import 'package:agent/pages/server_profile.dart';
-import 'package:agent/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoekits/flutter_zoekits.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';

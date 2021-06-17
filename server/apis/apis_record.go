@@ -19,6 +19,7 @@ package apis
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"go.zoe.im/payserver/server/core"
@@ -60,6 +61,27 @@ func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
+	q := r.URL.Query()
+
+	method := q.Get("method")
+	if !core.IsSupportedPayType(method) {
+		wr.WithCode(201).WithErrorf("unsupported pay method")
+		return 
+	}
+
+	offset := 0
+	limit := 10
+
+	if o, err := strconv.Atoi(q.Get("offset")); err == nil {
+		offset = o
+	}
+	
+	if l, err := strconv.Atoi(q.Get("limit")); err == nil && l < 50 {
+		limit = l
+	}
+
+	// query args
+	wr.WithDataOrErr(wa.ListRecords(core.PayType(method), offset, limit))
 }
 
 

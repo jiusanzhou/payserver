@@ -30,7 +30,7 @@ var (
 )
 
 // PrepareAgent return server information and code for register
-func (s *Server) PrepareAgent() (interface{}, error) {
+func (s *Server) PrepareAgent() (*core.RegisterAgentTicket, error) {
 	// generate a ticket and store in the store, for agent register
 	// if pending count greatter then max, just return error
 	n, err := s.store.CountPenddingAgents()
@@ -56,9 +56,13 @@ func (s *Server) PrepareAgent() (interface{}, error) {
 		return nil, err
 	}
 
-	return map[string]interface{}{
-		"ticket": ticket,
-		"server": s.Name(),
+	return &core.RegisterAgentTicket{
+		Name: s.c.Name,
+		Host: s.c.Host,
+		Version: s.c.Version,
+
+		Ticket: ticket,
+
 	}, nil
 }
 
@@ -82,6 +86,19 @@ func (s *Server) RegisterAgent(a *core.Agent) (*core.Agent, error) {
 	pa.HeartbeatAt = time.Now()
 
 	return s.store.UpdateAgent(pa)
+}
+
+func (s *Server) UpdateAgent(id string, agent *core.Agent) (*core.Agent, error) {
+	agent.UID = id
+	return s.store.UpdateAgent(agent)
+}
+
+func (s *Server) GetAgent(id string) (*core.Agent, error) {
+	return s.store.GetAgent(id)
+}
+
+func (s *Server) DeleteAgent(id string) (error) {
+	return s.store.DeleteAgent(id)
 }
 
 func (s *Server) ListAgents() ([]*core.Agent, error) {

@@ -23,9 +23,14 @@ type PayType string
 var (
 	PayTypeWeChat PayType = "wechat"
 	PayTypeAlipay PayType = "alipay"
+	PayTypeAll PayType = ""
 
 	_supportedPayTypes = map[PayType]bool{
 		PayTypeAlipay: true,
+		PayTypeWeChat: true,
+
+		// just for query
+		PayTypeAll: true,
 	}
 )
 

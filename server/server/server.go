@@ -33,11 +33,6 @@ type Server struct {
 	c     *config.Config
 }
 
-func (s *Server) Name() string {
-	// TODO:
-	return s.c.Name
-}
-
 func New(c *config.Config, store store.Storage) *Server {
 	s := &Server{
 		store: store,

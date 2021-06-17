@@ -44,13 +44,13 @@ func (d driver) DeleteOrder(uid string) error {
 
 func (d driver) GetOrder(uid string) (*core.Order, error) {
 	var or core.Order
-	return &or, d.Where("uid = ? AND delete_at == null", uid).First(&or).Error
+	return &or, d.Where("uid = ? AND deleted_at = null", uid).First(&or).Error
 }
 
 func (d driver) GetOrderByAppAndNumber(appid string, num string) (*core.Order, error) {
 	// by order id, create from outside
 	var or core.Order
-	return &or, d.Where("app_id = ? AND o_number = ? AND delete_at == null", appid, num).First(&or).Error
+	return &or, d.Where("app_id = ? AND o_number = ? AND deleted_at = null", appid, num).First(&or).Error
 }
 
 func (d driver) GetOrdersByApp(appid string, statuss ...core.OrderStatus) ([]*core.Order, error) {

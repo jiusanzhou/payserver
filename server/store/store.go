@@ -39,7 +39,9 @@ type Storage interface {
 type AgentStore interface {
 	CreateAgent(*core.Agent) (*core.Agent, error)
 	UpdateAgent(*core.Agent) (*core.Agent, error)
+	GetAgent(id string) (*core.Agent, error)
 	GetAgentByTicket(ticket string) (*core.Agent, error)
+	DeleteAgent(id string) (error)
 	CountPenddingAgents() (int, error)
 	ListAgents() ([]*core.Agent, error)
 }
@@ -57,6 +59,7 @@ type RecordStore interface {
 	CreateRecord(*core.PayRecord) (*core.PayRecord, error)
 	UpdateRecord(*core.PayRecord) (*core.PayRecord, error)
 	GetRecord(id string) (*core.PayRecord, error)
+	ListRecords(method core.PayType, offset, limit int) ([]*core.PayRecord, error)
 	DeleteRecord(id string) error
 }
 

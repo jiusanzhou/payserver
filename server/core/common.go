@@ -34,7 +34,7 @@ type Model struct {
 
 	CreateAt  time.Time  `json:"create_at"`
 	UpdatedAt time.Time  `json:"update_at"`
-	DeleteAt  *time.Time `json:"delete_at,omitempty" gorm:"index"`
+	DeletedAt  *time.Time `json:"deleted_at,omitempty" gorm:"index"`
 }
 
 // BeforeCreate ...

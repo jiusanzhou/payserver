@@ -27,8 +27,9 @@ type Config struct {
 	HTTPAllowOrigin string `json:"http_allow_origin,omitempty" yaml:"http_allow_origin"`
 
 	// only for client/agent to register
-	Name string `json:"name,omitempty" yaml:"name"`
-	Host string `json:"host,omitempty" yaml:"host"`
+	Name    string `json:"name,omitempty" yaml:"name"`
+	Host    string `json:"host,omitempty" yaml:"host"`
+	Version string `json:"version,omitempty" yaml:"version"`
 
 	// default price floor and ceil
 	PriceFloor int `json:"price_floor,omitempty" yaml:"price_floor"` // -
@@ -48,11 +49,17 @@ type Config struct {
 	// TODO: limit requests
 }
 
+func (c *Config) Validate() error {
+	// TODO: add more
+	return nil
+}
+
 func NewConfig() *Config {
 	return &Config{
 		Addr:       ":30911",
 		PriceFloor: 20, // -0.01 - -0.2 (amost 20)
 
 		Name: "官方云",
+		Version: "v1",
 	}
 }

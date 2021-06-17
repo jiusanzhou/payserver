@@ -26,3 +26,7 @@ func (s *Server) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
 func (s *Server) GetRecord(uid string) (*core.PayRecord, error) {
 	return s.store.GetRecord(uid)
 }
+
+func (s *Server) ListRecords(method core.PayType, offset, limit int) ([]*core.PayRecord, error) {
+	return s.store.ListRecords(method, offset, limit)
+}

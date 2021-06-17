@@ -20,5 +20,5 @@ import "go.zoe.im/payserver/server/core"
 
 func (d driver) GetApp(id string) (*core.App, error) {
 	var app core.App
-	return &app, d.Where("uid = ? AND delete_at == null", id).First(&app).Error
+	return &app, d.Where("uid = ? AND deleted_at = null", id).First(&app).Error
 }

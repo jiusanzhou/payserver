@@ -23,7 +23,7 @@ func (d driver) GetAgentByTicket(ticket string) (*core.Agent, error) {
 	return &a, d.Where("ticket = ?", ticket).First(&a).Error
 }
 
-func (d driver) DeleteAgent(uid string) (error) {
+func (d driver) DeleteAgent(uid string) error {
 
 	if uid == "" {
 		return store.ErrMissObjectID

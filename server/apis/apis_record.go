@@ -66,7 +66,7 @@ func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
 	method := q.Get("method")
 	if !core.IsSupportedPayType(method) {
 		wr.WithCode(201).WithErrorf("unsupported pay method")
-		return 
+		return
 	}
 
 	offset := 0
@@ -75,7 +75,7 @@ func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
 	if o, err := strconv.Atoi(q.Get("offset")); err == nil {
 		offset = o
 	}
-	
+
 	if l, err := strconv.Atoi(q.Get("limit")); err == nil && l < 50 {
 		limit = l
 	}
@@ -83,6 +83,5 @@ func (wa *WebAPI) HandleListRecords(w http.ResponseWriter, r *http.Request) {
 	// query args
 	wr.WithDataOrErr(wa.ListRecords(core.PayType(method), offset, limit))
 }
-
 
 // won't privder delete

@@ -18,7 +18,6 @@ package server
 
 import (
 	"reflect"
-	"sync"
 	"testing"
 
 	"go.zoe.im/payserver/server/config"
@@ -30,7 +29,6 @@ func TestServer_CreateOrder(t *testing.T) {
 	type fields struct {
 		store     store.Storage
 		uniqueIDs map[string]bool
-		RWMutex   sync.RWMutex
 		c         *config.Config
 	}
 	type args struct {
@@ -52,7 +50,6 @@ func TestServer_CreateOrder(t *testing.T) {
 			s := &Server{
 				store:     tt.fields.store,
 				uniqueIDs: tt.fields.uniqueIDs,
-				RWMutex:   tt.fields.RWMutex,
 				c:         tt.fields.c,
 			}
 			got, err := s.CreateOrder(tt.args.appid, tt.args.method, tt.args.preorder)

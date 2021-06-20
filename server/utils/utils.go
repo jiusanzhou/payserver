@@ -20,7 +20,7 @@ package utils
 // 0, -1, -2, 1, 2
 // 0, 1, 2, -1, -2
 func GenPriceFloats(floor, ceil int) []int {
-	floats := make([]int, 1 + floor + ceil)
+	floats := make([]int, 1+floor+ceil)
 	floats[0] = 0
 	for i := 1; i <= floor; i++ {
 		floats[i] = -1 * i

@@ -26,12 +26,12 @@ import (
 )
 
 var (
-	ErrOrderNumberExits = errors.New("order number already exits")
+	ErrOrderNumberExits     = errors.New("order number already exits")
 	ErrUnsupportedPayMethod = errors.New("unsupported pay method")
-	ErrAppNotFound = errors.New("unknown app id")
-	ErrPenddingOrderLimit = errors.New("pendding order limit")
-	ErrNoAviableAgent = errors.New("no aviable agent")
-	ErrSchedPriceBusy = errors.New("sched price busy")
+	ErrAppNotFound          = errors.New("unknown app id")
+	ErrPenddingOrderLimit   = errors.New("pendding order limit")
+	ErrNoAviableAgent       = errors.New("no aviable agent")
+	ErrSchedPriceBusy       = errors.New("sched price busy")
 )
 
 func (s *Server) IsSupportedPayType(method string) bool {
@@ -80,7 +80,7 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 			agents = append(agents, a)
 		}
 	}
-	
+
 	if len(agents) == 0 {
 		return nil, ErrNoAviableAgent
 	}
@@ -96,7 +96,7 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 	// random to choose an agent for app and which is not busying(arrive the max pendding)
 
 	prefix := fmt.Sprintf("%v-%v", agent.UID, method)
-	
+
 	// check which one is not exits
 	// gen the prices array
 	var found bool
@@ -114,7 +114,7 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 	}
 	s.Unlock()
 
-	if (!found) {
+	if !found {
 		return nil, ErrSchedPriceBusy
 	}
 
@@ -123,15 +123,15 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 
 	// ok, preorder, app, agent, price all ready, let's create order
 	order := &core.Order{
-		AppID: appid,
-		PreOrder: *preorder,
+		AppID:     appid,
+		PreOrder:  *preorder,
 		ExpiresIn: app.ExpireIn, // from app or query?
 		// TODO: how to generate the QrData nad QrIamgeURL
 		// get from agent's price qrcode table or generate auto
 		SchedAgentUID: agent.UID,
-		SchedPayType: core.PayType(method),
-		SchedPrice: price,
-		Status: core.OrderStatusPending, // wait for paid
+		SchedPayType:  core.PayType(method),
+		SchedPrice:    price,
+		Status:        core.OrderStatusPending, // wait for paid
 	}
 
 	return s.store.CreateOrder(order)

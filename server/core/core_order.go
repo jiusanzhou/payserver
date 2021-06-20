@@ -17,10 +17,10 @@
 package core
 
 const (
-	OrderStatusPending = iota // wait for paid
-	OrderStatusPaid // paid
-	OrderStatusExpired // expired
-	OrderStatusCanceled //canceled
+	OrderStatusPending  = iota // wait for paid
+	OrderStatusPaid            // paid
+	OrderStatusExpired         // expired
+	OrderStatusCanceled        //canceled
 	OrderStatusUnknown
 )
 
@@ -47,9 +47,9 @@ type Order struct {
 	QrImageUrl string `json:"qr_image_url,omitempty" yaml:"qr_image_url"` // qrcode image url
 
 	// sched unique(price-agent<device>-type)
-	SchedAgentUID string `gorm:"index:sched,unique" json:"sched_agent_uid,omitempty" yaml:"sched_agent_uid"` // agent
+	SchedAgentUID string  `gorm:"index:sched,unique" json:"sched_agent_uid,omitempty" yaml:"sched_agent_uid"` // agent
 	SchedPayType  PayType `gorm:"index:sched,unique" json:"sched_pay_type,omitempty" yaml:"sched_pay_type"`   // pay type
-	SchedPrice    int    `gorm:"index:sched,unique" json:"sched_price,omitempty" yaml:"sched_price"`         // unit cent
+	SchedPrice    int     `gorm:"index:sched,unique" json:"sched_price,omitempty" yaml:"sched_price"`         // unit cent
 
 	PayRecordUID string      `json:"-,omitempty" yaml:"-"`                                                  //
 	Status       OrderStatus `json:"status,omitempty" yaml:"status"`                                        // order status

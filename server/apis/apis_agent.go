@@ -94,7 +94,6 @@ func (wa *WebAPI) HandleDeleteAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-
 	var uid = mux.Vars(r)["id"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
@@ -102,7 +101,7 @@ func (wa *WebAPI) HandleDeleteAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wr.WithDataOrErr(nil, wa.DeleteAgent(uid))
-	
+
 }
 
 func (wa *WebAPI) HandleUpdateAgent(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +150,6 @@ func (wa *WebAPI) HandleListRecordsByAgent(w http.ResponseWriter, r *http.Reques
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	
 }
 
 // HandleHeartbeatAgent handle the heartbeat from device

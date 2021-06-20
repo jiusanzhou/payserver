@@ -59,7 +59,7 @@ func NewConfig() *Config {
 		Addr:       ":30911",
 		PriceFloor: 20, // -0.01 - -0.2 (amost 20)
 
-		Name: "官方云",
+		Name:    "官方云",
 		Version: "v1",
 	}
 }

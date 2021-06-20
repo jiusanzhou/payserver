@@ -41,7 +41,7 @@ type AgentStore interface {
 	UpdateAgent(*core.Agent) (*core.Agent, error)
 	GetAgent(id string) (*core.Agent, error)
 	GetAgentByTicket(ticket string) (*core.Agent, error)
-	DeleteAgent(id string) (error)
+	DeleteAgent(id string) error
 	CountPenddingAgents() (int, error)
 	ListAgents() ([]*core.Agent, error)
 }

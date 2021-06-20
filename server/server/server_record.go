@@ -18,7 +18,6 @@ package server
 
 import "go.zoe.im/payserver/server/core"
 
-
 func (s *Server) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
 	return s.store.CreateRecord(rd)
 }

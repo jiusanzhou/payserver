@@ -30,14 +30,14 @@ type Server struct {
 	uniqueIDs map[string]bool
 	sync.RWMutex
 
-	c     *config.Config
+	c *config.Config
 }
 
 func New(c *config.Config, store store.Storage) *Server {
 	s := &Server{
-		store: store,
+		store:     store,
 		uniqueIDs: make(map[string]bool),
-		c:     c,
+		c:         c,
 	}
 
 	// TODO: init load from db

@@ -23,7 +23,7 @@ type PayType string
 var (
 	PayTypeWeChat PayType = "wechat"
 	PayTypeAlipay PayType = "alipay"
-	PayTypeAll PayType = ""
+	PayTypeAll    PayType = ""
 
 	_supportedPayTypes = map[PayType]bool{
 		PayTypeAlipay: true,
@@ -44,10 +44,10 @@ type PayRecord struct {
 	Model `json:"model,omitempty" yaml:"model"`
 
 	// use device id or device uid,  just use uid, make sure we register at first
-	AgentUID string `json:"agent_uid,omitempty" yaml:"agent_uid"`
+	AgentUID string  `json:"agent_uid,omitempty" yaml:"agent_uid"`
 	Type     PayType `json:"type,omitempty" yaml:"type"`     // wechat / alipay
-	Number   string `json:"number,omitempty" yaml:"number"` // platform number
-	Amount   int    `json:"amount,omitempty" yaml:"amount"` // received money unit cent
+	Number   string  `json:"number,omitempty" yaml:"number"` // platform number
+	Amount   int     `json:"amount,omitempty" yaml:"amount"` // received money unit cent
 
 	Timestamp time.Time `json:"timestamp,omitempty" yaml:"timestamp"` // agent local time
 

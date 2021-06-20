@@ -39,7 +39,7 @@ func (d driver) CountPenddingAgents() (int, error) {
 		Count(&count).Error
 }
 
-func (d driver) ListAgents() ([]*core.Agent, error) {
+func (d driver) ListAgents(offset, limit int, query ...interface{}) ([]*core.Agent, error) {
 	var as []*core.Agent
-	return as, d.Where("deleted_at = null").Find(&as).Error
+	return as, d.Where(query).Limit(limit).Offset(offset).Find(&as).Error
 }

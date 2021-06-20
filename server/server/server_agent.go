@@ -100,7 +100,10 @@ func (s *Server) DeleteAgent(id string) error {
 	return s.store.DeleteAgent(id)
 }
 
-func (s *Server) ListAgents() ([]*core.Agent, error) {
-	// TODO: add filter?
-	return s.store.ListAgents()
+func (s *Server) ListAgents(offset int, limit int) ([]*core.Agent, error) {
+	return s.store.ListAgents(offset, limit)
+}
+
+func (s *Server) ListAgentsByApp(id string, offset int, limit int) ([]*core.Agent, error) {
+	return s.store.ListAgents(offset, limit, "agent_uid = ?", id)
 }

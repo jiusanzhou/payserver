@@ -43,18 +43,18 @@ func (wa *WebAPI) Register(apiv1 *mux.Router) {
 	apiv1.HandleFunc("/agents", wa.HandleListAgents).Methods("GET") // TODO: add filter?
 	apiv1.HandleFunc("/agent/{uid}", wa.HandleGetAgent).Methods("GET")
 	apiv1.HandleFunc("/agent/{uid}", wa.HandleDeleteAgent).Methods("DELETE")
-	// apiv1.HandleFunc("/agent/{uid}", wa.HandleUpdateAgent).Methods("POST")
-	// apiv1.HandleFunc("/agent/{uid}/heartbeat", wa.HandleHeartbeatAgent).Methods("POST")
-	// apiv1.HandleFunc("/agent/{uid}/apps", wa.HandleListAppsByAgent).Methods("GET")
-	// apiv1.HandleFunc("/agent/{uid}/records", wa.HandleListRecordsByAgent).Methods("GET")
+	apiv1.HandleFunc("/agent/{uid}", wa.HandleUpdateAgent).Methods("POST")
+	apiv1.HandleFunc("/agent/{uid}/heartbeat", wa.HandleHeartbeatAgent).Methods("POST")
+	apiv1.HandleFunc("/agent/{uid}/apps", wa.HandleListAppsByAgent).Methods("GET")
+	apiv1.HandleFunc("/agent/{uid}/records", wa.HandleListRecordsByAgent).Methods("GET")
 
-	// apiv1.HandleFunc("/apps", wa.HandleListApp).Methods("GET")
-	// apiv1.HandleFunc("/apps", wa.HandleCreateApp).Methods("POST")
-	// apiv1.HandleFunc("/app/{uid}", wa.HandleGetApp).Methods("GET")
-	// apiv1.HandleFunc("/app/{uid}", wa.HandleDeleteApp).Methods("DELETE")
-	// apiv1.HandleFunc("/app/{uid}", wa.HandleUpdateApp).Methods("POST")
-	// apiv1.HandleFunc("/app/{uid}/agents", wa.HandleListAgentsByApp).Methods("GET")
-	// apiv1.HandleFunc("/app/{uid}/records", wa.HandleListRecordsByApp).Methods("GET")
+	apiv1.HandleFunc("/apps", wa.HandleListApp).Methods("GET")
+	apiv1.HandleFunc("/apps", wa.HandleCreateApp).Methods("POST")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleGetApp).Methods("GET")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleDeleteApp).Methods("DELETE")
+	apiv1.HandleFunc("/app/{uid}", wa.HandleUpdateApp).Methods("POST")
+	apiv1.HandleFunc("/app/{uid}/agents", wa.HandleListAgentsByApp).Methods("GET")
+	apiv1.HandleFunc("/app/{uid}/records", wa.HandleListRecordsByApp).Methods("GET")
 }
 
 func NewWebAPI(s *server.Server) *WebAPI {

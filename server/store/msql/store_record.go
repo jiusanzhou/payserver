@@ -30,9 +30,9 @@ func (d driver) GetRecord(uid string) (*core.PayRecord, error) {
 	return &rd, d.Where("uid = ? AND deleted_at = null", uid).First(&rd).Error
 }
 
-func (d driver) ListRecords(method core.PayType, offset, limit int) ([]*core.PayRecord, error) {
+func (d driver) ListRecords(offset, limit int, query ...interface{}) ([]*core.PayRecord, error) {
 	var rs []*core.PayRecord
-	return rs, d.Where("type = ? AND deleted_at = null", method).Offset(offset).Limit(limit).Find(&rs).Error
+	return rs, d.Where(query).Offset(offset).Limit(limit).Find(&rs).Error
 }
 
 func (d driver) UpdateRecord(rd *core.PayRecord) (*core.PayRecord, error) {

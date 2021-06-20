@@ -19,6 +19,7 @@ package apis
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -74,7 +75,20 @@ func (wa *WebAPI) HandleListAgents(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	wr.WithDataOrErr(wa.ListAgents())
+	offset := 0
+	limit := 10
+
+	q := r.URL.Query()
+
+	if o, err := strconv.Atoi(q.Get("offset")); err == nil {
+		offset = o
+	}
+
+	if l, err := strconv.Atoi(q.Get("limit")); err == nil && l < 50 {
+		limit = l
+	}
+
+	wr.WithDataOrErr(wa.ListAgents(offset, limit))
 }
 
 func (wa *WebAPI) HandleGetAgent(w http.ResponseWriter, r *http.Request) {
@@ -136,27 +150,77 @@ func (wa *WebAPI) HandleUpdateAgent(w http.ResponseWriter, r *http.Request) {
 	agent.Ticket = ""
 	agent.UID = ""
 
+	// only keep: device_info, external, status, pay_types, device_id, heartbeat_at
+
 	wr.WithDataOrErr(wa.UpdateAgent(uid, &agent))
 }
 
 func (wa *WebAPI) HandleListAppsByAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
-	wr.Flush()
+	var uid = mux.Vars(r)["id"]
+	if uid == "" {
+		wr.WithCode(200).WithErrorf("agent id can't be empty")
+		return
+	}
+
+	offset := 0
+	limit := 10
+
+	q := r.URL.Query()
+
+	if o, err := strconv.Atoi(q.Get("offset")); err == nil {
+		offset = o
+	}
+
+	if l, err := strconv.Atoi(q.Get("limit")); err == nil && l < 50 {
+		limit = l
+	}
+
+	wr.WithDataOrErr(wa.ListAppsByAgent(uid, offset, limit))
 }
 
 func (wa *WebAPI) HandleListRecordsByAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
+	var uid = mux.Vars(r)["id"]
+	if uid == "" {
+		wr.WithCode(200).WithErrorf("agent id can't be empty")
+		return
+	}
+
+	offset := 0
+	limit := 10
+
+	q := r.URL.Query()
+
+	if o, err := strconv.Atoi(q.Get("offset")); err == nil {
+		offset = o
+	}
+
+	if l, err := strconv.Atoi(q.Get("limit")); err == nil && l < 50 {
+		limit = l
+	}
+
+	wr.WithDataOrErr(wa.ListRecordsByAgent(uid, offset, limit))
 }
 
 // HandleHeartbeatAgent handle the heartbeat from device
 func (wa *WebAPI) HandleHeartbeatAgent(w http.ResponseWriter, r *http.Request) {
 	// register with the id
 	wr := httputil.NewResponse(w)
-	defer r.Body.Close()
+	defer wr.Flush()
 
-	wr.Flush()
+	var uid = mux.Vars(r)["id"]
+	if uid == "" {
+		wr.WithCode(200).WithErrorf("agent id can't be empty")
+		return
+	}
+
+	// update heartbeat_at
+	wr.WithDataOrErr(wa.UpdateAgent(uid, &core.Agent{
+		HeartbeatAt: time.Now(),
+	}))
 }

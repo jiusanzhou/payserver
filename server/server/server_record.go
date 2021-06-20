@@ -27,5 +27,13 @@ func (s *Server) GetRecord(uid string) (*core.PayRecord, error) {
 }
 
 func (s *Server) ListRecords(method core.PayType, offset, limit int) ([]*core.PayRecord, error) {
-	return s.store.ListRecords(method, offset, limit)
+	return s.store.ListRecords(offset, limit, "type = ?", method)
+}
+
+func (s *Server) ListRecordsByAgent(uid string, offset, limit int) ([]*core.PayRecord, error) {
+	return s.store.ListRecords(offset, limit, "sched_agent_uid = ?", uid)
+}
+
+func (s *Server) ListRecordsByApp(uid string, offset, limit int) ([]*core.PayRecord, error) {
+	return s.store.ListRecords(offset, limit, "app_id = ?", uid)
 }

@@ -18,7 +18,24 @@ package msql
 
 import "go.zoe.im/payserver/server/core"
 
+func (d driver) CreateApp(app *core.App) (*core.App, error) {
+	return app, d.Create(app).Error
+}
+
 func (d driver) GetApp(id string) (*core.App, error) {
 	var app core.App
 	return &app, d.Where("uid = ? AND deleted_at = null", id).First(&app).Error
+}
+
+func (d driver) DeleteApp(id string) error {
+	return d.Where("uid = ? AND deleted_at = null", id).Error
+}
+
+func (d driver) UpdateApp(app *core.App) (*core.App, error) {
+	return app, d.Model(app).Updates(app).Error
+}
+
+func (d driver) ListApps(offset, limit int, query ...interface{}) ([]*core.App, error) {
+	var apps []*core.App
+	return apps, d.Where(query).Offset(offset).Limit(limit).Find(&apps).Error
 }

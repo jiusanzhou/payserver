@@ -43,7 +43,7 @@ type AgentStore interface {
 	GetAgentByTicket(ticket string) (*core.Agent, error)
 	DeleteAgent(id string) error
 	CountPenddingAgents() (int, error)
-	ListAgents() ([]*core.Agent, error)
+	ListAgents(offset, limit int, query ...interface{}) ([]*core.Agent, error)
 }
 
 type OrderStore interface {
@@ -59,12 +59,16 @@ type RecordStore interface {
 	CreateRecord(*core.PayRecord) (*core.PayRecord, error)
 	UpdateRecord(*core.PayRecord) (*core.PayRecord, error)
 	GetRecord(id string) (*core.PayRecord, error)
-	ListRecords(method core.PayType, offset, limit int) ([]*core.PayRecord, error)
+	ListRecords(offset, limit int, query ...interface{}) ([]*core.PayRecord, error)
 	DeleteRecord(id string) error
 }
 
 type AppStore interface {
+	CreateApp(app *core.App) (*core.App, error)
 	GetApp(id string) (*core.App, error)
+	UpdateApp(app *core.App) (*core.App, error)
+	DeleteApp(id string) error
+	ListApps(offset, limit int, query ...interface{}) ([]*core.App, error)
 }
 
 // ===========================================================

@@ -17,11 +17,17 @@
 package server
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/google/uuid"
 	"go.zoe.im/payserver/server/core"
 )
 
-func (s *Server) CreateApp(app *core.App) (*core.App, error) {
+func (s *Server) EnsureApp(app *core.App) error {
+	if !strings.HasPrefix(app.CallbackURL, "http") {
+		return errors.New("callback shoube be a url")
+	}
 
 	if app.ExpireIn == 0 {
 		app.ExpireIn = s.c.ExpireIn
@@ -37,6 +43,14 @@ func (s *Server) CreateApp(app *core.App) (*core.App, error) {
 
 	if app.MaxPenddingOrder <= 0 {
 		app.MaxPenddingOrder = s.c.MaxPenddingOrder
+	}
+
+	return nil
+}
+
+func (s *Server) CreateApp(app *core.App) (*core.App, error) {
+	if err := s.EnsureApp(app); err != nil {
+		return nil, err
 	}
 
 	// secret ...
@@ -56,6 +70,10 @@ func (s *Server) DeleteApp(id string) error {
 	return s.store.DeleteApp(id)
 }
 func (s *Server) UpdateApp(id string, app *core.App) (*core.App, error) {
+	if err := s.EnsureApp(app); err != nil {
+		return nil, err
+	}
+
 	app.UID = id
 	return s.store.UpdateApp(app)
 }

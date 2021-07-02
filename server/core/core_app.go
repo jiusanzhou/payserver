@@ -18,10 +18,10 @@ package core
 
 // App is the application register in the server to create order
 type App struct {
-	Model `json:"model,omitempty" yaml:"model"`
+	Model
 
-	Name        string `json:"name,omitempty" yaml:"name"`               // app name
-	Description string `json:"description,omitempty" yaml:"description"` // description
+	Name        string `gorm:"index,unique" json:"name,omitempty" yaml:"name"` // app name
+	Description string `json:"description,omitempty" yaml:"description"`       // description
 
 	CallbackURL string `json:"callback_url,omitempty" yaml:"callback_url"` // notify the app server
 	Secret      string `json:"secret,omitempty" yaml:"secret"`             // secret for app

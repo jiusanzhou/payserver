@@ -38,7 +38,7 @@ func (o AgentStatus) String() string {
 }
 
 type Agent struct {
-	Model `json:"model,omitempty" yaml:"model"`
+	Model
 
 	// imei or something else
 	DeviceID string `gorm:"index:device,unique" json:"device_id,omitempty" yaml:"device_id"`

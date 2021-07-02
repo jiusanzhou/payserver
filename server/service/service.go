@@ -17,7 +17,10 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 
 	"go.zoe.im/payserver/server/apis"
 	"go.zoe.im/payserver/server/config"
@@ -38,15 +41,28 @@ type Service struct {
 func (s *Service) Run() error {
 	var err error
 
+	// check config
+	if err = s.Config.Validate(); err != nil {
+		return err
+	}
+
+	if s.Config.Debug {
+		log.Println("[DEBUG] open debug mode")
+	}
+
 	// init or start other things
-	s.store, err = store.New(store.OptionURI(s.DB), store.OptionDebug(s.Debug))
-	if err != nil {
+	if s.store, err = store.New(store.OptionURI(s.DB), store.OptionDebug(s.Debug)); err != nil {
 		return err
 	}
 
 	// TODO: inject?
 	s.server = server.New(s.Config, s.store)
 	s.webapi = apis.NewWebAPI(s.server)
+
+	// boostrap
+	if err = s.Boostrap(); err != nil {
+		return err
+	}
 
 	// grace start
 	err = x.GraceRun(func() error {
@@ -58,6 +74,45 @@ func (s *Service) Run() error {
 	// TODO: clean
 
 	return err
+}
+
+func (s *Service) Boostrap() error {
+	// bootstrap the server
+	for _, a := range s.Config.Apps {
+		// check the name
+		if a.Name == "" {
+			log.Println("[WARN] app must have a name")
+			continue
+		}
+
+		// create or update app
+		if b, err := s.store.GetAppByName(a.Name); err == nil {
+			// update the app
+			log.Println("[INFO] update the app", b.UID)
+			c, err := s.server.UpdateApp(b.UID, &a)
+			if err != nil {
+				log.Println("[ERROR] update error", err)
+			} else {
+				var buf bytes.Buffer
+				json.NewEncoder(&buf).Encode(c)
+				log.Println("[INFO] update success =>", buf.String())
+			}
+		} else {
+			// can't found one, just create
+			// create the app
+			log.Println("[INFO] create the app")
+			c, err := s.server.CreateApp(&a)
+			if err != nil {
+				log.Println("[ERROR] create error", err)
+			} else {
+				var buf bytes.Buffer
+				json.NewEncoder(&buf).Encode(c)
+				log.Println("[INFO] create success =>", buf.String())
+			}
+		}
+	}
+
+	return nil
 }
 
 func New() *Service {

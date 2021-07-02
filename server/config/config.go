@@ -17,6 +17,9 @@
 package config
 
 import (
+	"errors"
+	"net/url"
+
 	"go.zoe.im/payserver/server/core"
 )
 
@@ -49,8 +52,22 @@ type Config struct {
 	// TODO: limit requests
 }
 
+// Validate TODO: auto generate from tag
+// TODO: auto add default value from tag or struct
 func (c *Config) Validate() error {
-	// TODO: add more
+	if c.Name == "" {
+		return errors.New("name can't be empty")
+	}
+
+	if _, err := url.Parse(c.Host); err != nil {
+		return errors.New("host is invalidated")
+	}
+
+	if c.Version == "" {
+		// TODO: c.Version must lease than x.Version
+		c.Version = "v1"
+	}
+
 	return nil
 }
 

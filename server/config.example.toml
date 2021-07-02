@@ -1,0 +1,20 @@
+addr = ":30910"
+
+debug = false
+http_allow_origin = false
+
+name = "官方云"
+host = "https://example.com"
+
+price_floor = 20
+price_ceil = 0
+
+max_pendding_agent = 2
+
+expire_in = 300
+max_pendding_order = 20
+
+[[apps]]
+name = "Demo1"
+description = "Demo app"
+callback_url = "https://test.com"

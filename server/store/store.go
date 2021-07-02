@@ -66,6 +66,7 @@ type RecordStore interface {
 type AppStore interface {
 	CreateApp(app *core.App) (*core.App, error)
 	GetApp(id string) (*core.App, error)
+	GetAppByName(name string) (*core.App, error)
 	UpdateApp(app *core.App) (*core.App, error)
 	DeleteApp(id string) error
 	ListApps(offset, limit int, query ...interface{}) ([]*core.App, error)

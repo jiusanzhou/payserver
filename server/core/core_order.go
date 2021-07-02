@@ -36,7 +36,7 @@ func (o OrderStatus) String() string {
 
 // Order create a order for pay
 type Order struct {
-	Model `json:"model,omitempty" yaml:"model"`
+	Model
 
 	AppID    string   `gorm:"index:pre_app_number,unique" json:"app_id,omitempty" yaml:"app_id"`
 	PreOrder PreOrder `gorm:"embedded;embeddedPrefix:o_" json:"pre_order,omitempty" yaml:"pre_order"`

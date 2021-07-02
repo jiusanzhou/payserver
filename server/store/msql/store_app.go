@@ -24,11 +24,16 @@ func (d driver) CreateApp(app *core.App) (*core.App, error) {
 
 func (d driver) GetApp(id string) (*core.App, error) {
 	var app core.App
-	return &app, d.Where("uid = ? AND deleted_at = null", id).First(&app).Error
+	return &app, d.Where("uid = ?", id).First(&app).Error
+}
+
+func (d driver) GetAppByName(name string) (*core.App, error) {
+	var app core.App
+	return &app, d.Where("name = ?", name).First(&app).Error
 }
 
 func (d driver) DeleteApp(id string) error {
-	return d.Where("uid = ? AND deleted_at = null", id).Error
+	return d.Where("uid = ?", id).Error
 }
 
 func (d driver) UpdateApp(app *core.App) (*core.App, error) {

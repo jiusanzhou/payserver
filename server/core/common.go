@@ -27,7 +27,7 @@ import (
 type Model struct {
 
 	// required: true
-	ID int `json:"id" gorm:"primary_key"`
+	ID int `json:"id" gorm:"primary_key;autoIncrement:true"`
 
 	// required: true
 	UID string `json:"uid" gorm:"primary_key"` // uuid?

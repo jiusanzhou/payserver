@@ -41,7 +41,7 @@ func IsSupportedPayType(method string) bool {
 
 // PayRecord -> Order 收款记录
 type PayRecord struct {
-	Model `json:"model,omitempty" yaml:"model"`
+	Model
 
 	// use device id or device uid,  just use uid, make sure we register at first
 	AgentUID string  `json:"agent_uid,omitempty" yaml:"agent_uid"`

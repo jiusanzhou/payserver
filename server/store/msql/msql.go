@@ -49,20 +49,19 @@ type driver struct {
 func New(c *store.Config) (store.Storage, error) {
 	dbConfig := &gorm.Config{}
 
-	// turn on debug for msql
-	if c.Debug {
-		dbConfig.Logger = logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold: time.Second,   // 慢 SQL 阈值
-				LogLevel:      logger.Silent, // Log level
-				Colorful:      false,         // 禁用彩色打印
-			},
-		)
-	}
+	dbConfig.Logger = logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold: time.Second,   // 慢 SQL 阈值
+			LogLevel:      logger.Silent, // Log level
+			Colorful:      false,         // 禁用彩色打印
+		},
+	)
 
 	var err error
-	d := &driver{}
+	d := &driver{
+		c: c,
+	}
 
 	if c.URI == "" {
 		c.URI = "sqlite3://default.sqlite3"
@@ -81,6 +80,10 @@ func New(c *store.Config) (store.Storage, error) {
 	d.DB, err = gorm.Open(dial, dbConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	if c.Debug {
+		d.DB = d.DB.Session(&gorm.Session{Logger: d.DB.Logger.LogMode(logger.Info)})
 	}
 
 	// global store the db

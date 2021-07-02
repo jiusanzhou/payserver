@@ -27,7 +27,7 @@ func (d driver) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
 
 func (d driver) GetRecord(uid string) (*core.PayRecord, error) {
 	var rd core.PayRecord
-	return &rd, d.Where("uid = ? AND deleted_at = null", uid).First(&rd).Error
+	return &rd, d.Where("uid = ?", uid).First(&rd).Error
 }
 
 func (d driver) ListRecords(offset, limit int, query ...interface{}) ([]*core.PayRecord, error) {

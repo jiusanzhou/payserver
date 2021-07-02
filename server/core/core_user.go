@@ -17,7 +17,7 @@
 package core
 
 type User struct {
-	Model `json:"model,omitempty" yaml:"model"`
+	Model
 
 	Account  string `json:"account,omitempty" yaml:"account"`
 	Token    string `json:"token,omitempty" yaml:"token"`

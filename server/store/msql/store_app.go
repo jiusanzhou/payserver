@@ -33,7 +33,7 @@ func (d driver) GetAppByName(name string) (*core.App, error) {
 }
 
 func (d driver) DeleteApp(id string) error {
-	return d.Where("uid = ?", id).Error
+	return d.Where("uid = ?", id).Delete(&core.App{}).Error
 }
 
 func (d driver) UpdateApp(app *core.App) (*core.App, error) {

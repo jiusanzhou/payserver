@@ -13,3 +13,10 @@ func WithHeader(key string, valueFn func(r *http.Request) string) func(http.Hand
 		return http.HandlerFunc(fn)
 	}
 }
+
+func NullIfErr(data interface{}, err error) (interface{}, error) {
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

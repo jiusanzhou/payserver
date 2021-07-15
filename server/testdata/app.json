@@ -1,0 +1,8 @@
+{
+    "name": "Test 2",
+    "description": "ok let's go!",
+    "callback_url": "https://demo.com/webhook/notify",
+    "expire_in": 60,
+    "price_ceil": 10,
+    "price_floor": 10
+}

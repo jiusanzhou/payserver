@@ -1,6 +1,6 @@
-addr = ":30910"
+addr = ":30911"
 
-debug = false
+debug = true
 http_allow_origin = false
 
 name = "官方云"

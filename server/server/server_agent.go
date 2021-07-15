@@ -30,7 +30,7 @@ var (
 )
 
 // PrepareAgent return server information and code for register
-func (s *Server) PrepareAgent() (*core.RegisterAgentTicket, error) {
+func (s *Server) PrepareAgent(agent *core.Agent) (*core.RegisterAgentTicket, error) {
 	// generate a ticket and store in the store, for agent register
 	// if pending count greatter then max, just return error
 	n, err := s.store.CountPenddingAgents()
@@ -46,10 +46,10 @@ func (s *Server) PrepareAgent() (*core.RegisterAgentTicket, error) {
 	// let's generate a pending agent, and store to database
 	ticket := uuid.New().String()
 
-	_, err = s.store.CreateAgent(&core.Agent{
-		Ticket: ticket,
-		Status: core.AgentStatusPendding,
-	})
+	agent.Ticket = ticket
+	agent.Status = core.AgentStatusPendding
+
+	_, err = s.store.CreateAgent(agent)
 
 	if err != nil {
 		log.Println("create pendding agent error:", err)
@@ -73,12 +73,20 @@ func (s *Server) RegisterAgent(a *core.Agent) (*core.Agent, error) {
 		return nil, err
 	}
 
+	// if we can find one device with ticket
+	// just return error
+	if pa.Status != core.AgentStatusPendding {
+		// that means we have be registed with this ticket
+		return nil, errors.New("ticket has been used")
+	}
+
 	// copy data and save
 	pa.DeviceID = a.DeviceID
 	pa.DeviceInfo = a.DeviceInfo
 	pa.PayTypes = a.PayTypes
 	pa.External = a.External
 
+	// set status to normal at register
 	pa.Status = core.AgentStatusNormal
 
 	// heartbeat at register time

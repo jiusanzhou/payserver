@@ -38,7 +38,7 @@ func (wa *WebAPI) Register(apiv1 *mux.Router) {
 	apiv1.HandleFunc("/record/{uid}", wa.HandleGetRecord).Methods("GET")
 	apiv1.HandleFunc("/records", wa.HandleListRecords).Methods("GET") // TODO: by create time?
 
-	apiv1.HandleFunc("/agent/prepare", wa.HandlePrepareAgent).Methods("GET")
+	apiv1.HandleFunc("/agent/prepare", wa.HandlePrepareAgent).Methods("POST")
 	apiv1.HandleFunc("/agents", wa.HandleRegisterAgent).Methods("POST")
 	apiv1.HandleFunc("/agents", wa.HandleListAgents).Methods("GET") // TODO: add filter?
 	apiv1.HandleFunc("/agent/{uid}", wa.HandleGetAgent).Methods("GET")

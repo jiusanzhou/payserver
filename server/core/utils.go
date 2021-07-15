@@ -18,11 +18,11 @@ package core
 
 type RegisterAgentTicket struct {
 	// server information for api
-	Name    string `json:"name,omitempty" yaml:"name"`
-	Host    string `json:"host,omitempty" yaml:"host"`
-	Version string `json:"version,omitempty" yaml:"version"`
+	Name    string `json:"name" yaml:"name"`
+	Host    string `json:"host" yaml:"host"`
+	Version string `json:"version" yaml:"version"`
 
 	// agent certify
 	UID    string `json:"uid,omitempty" yaml:"uid"` // should't offers? deprecated
-	Ticket string `json:"ticket,omitempty" yaml:"ticket"`
+	Ticket string `json:"ticket" yaml:"ticket"`
 }

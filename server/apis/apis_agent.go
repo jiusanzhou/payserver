@@ -24,6 +24,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.zoe.im/payserver/server/core"
+	"go.zoe.im/payserver/server/utils"
 	"go.zoe.im/x/httputil"
 )
 
@@ -33,7 +34,18 @@ func (wa *WebAPI) HandlePrepareAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	wr.WithDataOrErr(wa.PrepareAgent())
+	var agent core.Agent
+	if err := json.NewDecoder(r.Body).Decode(&agent); err != nil {
+		wr.WithCode(101).WithErrorf("decode agent error: %s", err)
+		return
+	}
+
+	if agent.DeviceID == "" {
+		wr.WithCode(103).WithErrorf("deviceid can't be empty")
+		return
+	}
+
+	wr.WithDataOrErr(wa.PrepareAgent(&agent))
 }
 
 // HandleRegisterAgent register to an agent
@@ -48,7 +60,7 @@ func (wa *WebAPI) HandleRegisterAgent(w http.ResponseWriter, r *http.Request) {
 
 	var agent core.Agent
 	if err := json.NewDecoder(r.Body).Decode(&agent); err != nil {
-		wr.WithCode(101).WithErrorf("decode order error: %s", err)
+		wr.WithCode(101).WithErrorf("decode agent error: %s", err)
 		return
 	}
 
@@ -63,7 +75,7 @@ func (wa *WebAPI) HandleRegisterAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if agent.PayTypes == "" {
-		wr.WithCode(103).WithErrorf("must offer at least 1 pay types")
+		wr.WithCode(104).WithErrorf("must offer at least 1 pay types")
 		return
 	}
 
@@ -95,20 +107,20 @@ func (wa *WebAPI) HandleGetAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
 	}
 
-	wr.WithDataOrErr(wa.GetAgent(uid))
+	wr.WithDataOrErr(utils.NullIfErr(wa.GetAgent(uid)))
 }
 
 func (wa *WebAPI) HandleDeleteAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
@@ -122,7 +134,7 @@ func (wa *WebAPI) HandleUpdateAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
@@ -159,7 +171,7 @@ func (wa *WebAPI) HandleListAppsByAgent(w http.ResponseWriter, r *http.Request) 
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
@@ -185,7 +197,7 @@ func (wa *WebAPI) HandleListRecordsByAgent(w http.ResponseWriter, r *http.Reques
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
@@ -213,14 +225,18 @@ func (wa *WebAPI) HandleHeartbeatAgent(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("agent id can't be empty")
 		return
 	}
 
+	// TODO: add more information about device like location or status
+
 	// update heartbeat_at
-	wr.WithDataOrErr(wa.UpdateAgent(uid, &core.Agent{
+	_, err := wa.UpdateAgent(uid, &core.Agent{
 		HeartbeatAt: time.Now(),
-	}))
+	})
+
+	wr.WithError(err)
 }

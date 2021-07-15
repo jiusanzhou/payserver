@@ -17,10 +17,10 @@
 package core
 
 const (
-	OrderStatusPending  = iota // wait for paid
-	OrderStatusPaid            // paid
-	OrderStatusExpired         // expired
-	OrderStatusCanceled        //canceled
+	OrderStatusPending  = iota + 1 // wait for paid
+	OrderStatusPaid                // paid
+	OrderStatusExpired             // expired
+	OrderStatusCanceled            //canceled
 	OrderStatusUnknown
 )
 
@@ -38,29 +38,29 @@ func (o OrderStatus) String() string {
 type Order struct {
 	Model
 
-	AppID    string   `gorm:"index:pre_app_number,unique" json:"app_id,omitempty" yaml:"app_id"`
-	PreOrder PreOrder `gorm:"embedded;embeddedPrefix:o_" json:"pre_order,omitempty" yaml:"pre_order"`
+	AppID    string   `gorm:"index:pre_app_number,unique" json:"app_id" yaml:"app_id"`
+	PreOrder PreOrder `gorm:"embedded;embeddedPrefix:o_" json:"pre_order" yaml:"pre_order"`
 
-	ExpiresIn int `json:"expires_in,omitempty" yaml:"expires_in"` // expiry time (seconds)
+	ExpiresIn int `json:"expires_in" yaml:"expires_in"` // expiry time (seconds)
 
-	QrData     string `json:"qr_data,omitempty" yaml:"qr_data"`           // qrcode data
-	QrImageUrl string `json:"qr_image_url,omitempty" yaml:"qr_image_url"` // qrcode image url
+	QrData     string `json:"qr_data" yaml:"qr_data"`           // qrcode data
+	QrImageUrl string `json:"qr_image_url" yaml:"qr_image_url"` // qrcode image url
 
 	// sched unique(price-agent<device>-type)
-	SchedAgentUID string  `gorm:"index:sched,unique" json:"sched_agent_uid,omitempty" yaml:"sched_agent_uid"` // agent
-	SchedPayType  PayType `gorm:"index:sched,unique" json:"sched_pay_type,omitempty" yaml:"sched_pay_type"`   // pay type
-	SchedPrice    int     `gorm:"index:sched,unique" json:"sched_price,omitempty" yaml:"sched_price"`         // unit cent
+	SchedAgentUID string  `gorm:"index:sched,unique" json:"sched_agent_uid" yaml:"sched_agent_uid"` // agent
+	SchedPayType  PayType `gorm:"index:sched,unique" json:"sched_pay_type" yaml:"sched_pay_type"`   // pay type
+	SchedPrice    int     `gorm:"index:sched,unique" json:"sched_price" yaml:"sched_price"`         // unit cent
 
-	PayRecordUID string      `json:"-,omitempty" yaml:"-"`                                                  //
-	Status       OrderStatus `json:"status,omitempty" yaml:"status"`                                        // order status
-	PayRecord    *PayRecord  `gorm:"foreignKey:PayRecordUID" json:"pay_record,omitempty" yaml:"pay_record"` // pay record
+	PayRecordUID string      `json:"-" yaml:"-"`                                                  //
+	Status       OrderStatus `json:"status" yaml:"status"`                                        // order status
+	PayRecord    *PayRecord  `gorm:"foreignKey:PayRecordUID" json:"pay_record" yaml:"pay_record"` // pay record
 }
 
 type PreOrder struct {
 	// custom order data
-	Number      string `gorm:"index:pre_app_number,unique" json:"number,omitempty" yaml:"number"` // pre order number
-	Name        string `json:"name,omitempty" yaml:"name"`                                        // pre order name
-	Price       int    `json:"price,omitempty" yaml:"price"`                                      // pre order price unit cent
-	RedirectUrl string `json:"redirect_url,omitempty" yaml:"redirect_url"`                        // redirect url after success
-	External    string `json:"external,omitempty" yaml:"external"`                                // external info, like user
+	Number      string `gorm:"index:pre_app_number,unique" json:"number" yaml:"number"` // pre order number
+	Name        string `json:"name" yaml:"name"`                                        // pre order name
+	Price       int    `json:"price" yaml:"price"`                                      // pre order price unit cent
+	RedirectUrl string `json:"redirect_url" yaml:"redirect_url"`                        // redirect url after success
+	External    string `json:"external" yaml:"external"`                                // external info, like user
 }

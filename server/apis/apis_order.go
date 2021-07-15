@@ -22,6 +22,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.zoe.im/payserver/server/core"
+	"go.zoe.im/payserver/server/utils"
 	"go.zoe.im/x/httputil"
 )
 
@@ -66,20 +67,20 @@ func (wa *WebAPI) HandleGetOrder(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("order id can't be empty")
 		return
 	}
 
-	wr.WithDataOrErr(wa.GetOrder(uid))
+	wr.WithDataOrErr(utils.NullIfErr(wa.GetOrder(uid)))
 }
 
 func (wa *WebAPI) HandleGetOrderStatus(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("order id can't be empty")
 		return
@@ -92,7 +93,7 @@ func (wa *WebAPI) HandleCancelOrder(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("order id can't be empty").Flush()
 		return

@@ -20,25 +20,25 @@ package core
 type App struct {
 	Model
 
-	Name        string `gorm:"index,unique" json:"name,omitempty" yaml:"name"` // app name
-	Description string `json:"description,omitempty" yaml:"description"`       // description
+	Name        string `gorm:"index,unique" json:"name" yaml:"name"` // app name
+	Description string `json:"description" yaml:"description"`       // description
 
-	CallbackURL string `json:"callback_url,omitempty" yaml:"callback_url"` // notify the app server
-	Secret      string `json:"secret,omitempty" yaml:"secret"`             // secret for app
-	AESKey      string `json:"aes_key,omitempty" yaml:"aes_key"`           // aes key for data encode
+	CallbackURL string `json:"callback_url" yaml:"callback_url"` // notify the app server
+	Secret      string `json:"secret" yaml:"secret"`             // secret for app
+	AESKey      string `json:"aes_key" yaml:"aes_key"`           // aes key for data encode
 
 	// Configuration for app
-	PriceFloor       int `json:"price_floor,omitempty" yaml:"price_floor"` // price can be decrease to, default 100
-	PriceCeil        int `json:"price_ceil,omitempty" yaml:"price_ceil"`   // price can be increase to, default 0
-	ExpireIn         int `json:"expire_in,omitempty" yaml:"expire_in"`
-	MaxPenddingOrder int `json:"max_pendding_order,omitempty" yaml:"max_pendding_order"`
+	PriceFloor       int `json:"price_floor" yaml:"price_floor"` // price can be decrease to, default 100
+	PriceCeil        int `json:"price_ceil" yaml:"price_ceil"`   // price can be increase to, default 0
+	ExpireIn         int `json:"expire_in" yaml:"expire_in"`
+	MaxPenddingOrder int `json:"max_pendding_order" yaml:"max_pendding_order"`
 
 	// TODO: with weight?
-	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents,omitempty" yaml:"agents"`
+	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents" yaml:"agents"`
 
 	// TODO: belong to user
-	UserUID string `json:"user_uid,omitempty" yaml:"user_uid"`
-	User    *User  `gorm:"foreignKey:UserUID" json:"user,omitempty" yaml:"user"`
+	UserUID string `json:"user_uid" yaml:"user_uid"`
+	User    *User  `gorm:"foreignKey:UserUID" json:"user" yaml:"user"`
 }
 
-// TODO: customize AppAgent struct add Model<CreateAt> field
+// TODO: customize AppAgent struct add Model<CreateAt> and weight field

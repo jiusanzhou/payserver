@@ -21,7 +21,7 @@ import "time"
 type AgentStatus int
 
 const (
-	AgentStatusNormal = iota
+	AgentStatusNormal = iota + 1
 	AgentStatusOffline
 	AgentStatusDisable
 	AgentStatusPendding
@@ -41,21 +41,21 @@ type Agent struct {
 	Model
 
 	// imei or something else
-	DeviceID string `gorm:"index:device,unique" json:"device_id,omitempty" yaml:"device_id"`
+	DeviceID string `gorm:"index:device,unique" json:"device_id" yaml:"device_id"`
 	// [] support pay types: wechat alipay
-	PayTypes    string      `json:"pay_types,omitempty" yaml:"pay_types"`
-	HeartbeatAt time.Time   `json:"heartbeat_at,omitempty" yaml:"heartbeat_at"`
-	Status      AgentStatus `json:"status,omitempty" yaml:"status"`
+	PayTypes    string      `json:"pay_types" yaml:"pay_types"`
+	HeartbeatAt time.Time   `json:"heartbeat_at" yaml:"heartbeat_at"`
+	Status      AgentStatus `json:"status" yaml:"status"`
 
 	// for register a agent
-	Ticket string `gorm:"index" json:"ticket,omitempty" yaml:"ticket"`
+	Ticket string `gorm:"index" json:"ticket" yaml:"ticket"`
 
 	// {}
-	DeviceInfo string `json:"device_info,omitempty" yaml:"device_info"`
+	DeviceInfo string `json:"device_info" yaml:"device_info"`
 
 	// agent version or something else
 	// {}
-	External string `json:"external,omitempty" yaml:"external"`
+	External string `json:"external" yaml:"external"`
 
 	// Provider bind to device provider user
 }

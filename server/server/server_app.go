@@ -69,6 +69,7 @@ func (s *Server) GetApp(id string) (*core.App, error) {
 func (s *Server) DeleteApp(id string) error {
 	return s.store.DeleteApp(id)
 }
+
 func (s *Server) UpdateApp(id string, app *core.App) (*core.App, error) {
 	if err := s.EnsureApp(app); err != nil {
 		return nil, err
@@ -79,7 +80,7 @@ func (s *Server) UpdateApp(id string, app *core.App) (*core.App, error) {
 }
 
 func (s *Server) ListApps(offset, limit int) ([]*core.App, error) {
-	return s.store.ListApps(offset, limit, "agent_uid = ?")
+	return s.store.ListApps(offset, limit)
 }
 
 func (s *Server) ListAppsByAgent(id string, offset, limit int) ([]*core.App, error) {

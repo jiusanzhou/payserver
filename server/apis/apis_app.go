@@ -24,6 +24,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.zoe.im/payserver/server/core"
+	"go.zoe.im/payserver/server/utils"
 	"go.zoe.im/x/httputil"
 )
 
@@ -78,7 +79,7 @@ func (wa *WebAPI) HandleCreateApp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// max pending order >= 0
-	if app.MaxPenddingOrder <= 0 {
+	if app.MaxPenddingOrder < 0 {
 		wr.WithCode(204).WithErrorf("max pendding order should > 0")
 		return
 	}
@@ -95,20 +96,20 @@ func (wa *WebAPI) HandleGetApp(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return
 	}
 
-	wr.WithDataOrErr(wa.GetApp(uid))
+	wr.WithDataOrErr(utils.NullIfErr(wa.GetApp(uid)))
 }
 
 func (wa *WebAPI) HandleDeleteApp(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return
@@ -121,13 +122,13 @@ func (wa *WebAPI) HandleUpdateApp(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return
 	}
 
-	// marshal agent from body
+	// marshal app from body
 	var app core.App
 	if err := json.NewDecoder(r.Body).Decode(&app); err != nil {
 		wr.WithCode(101).WithErrorf("decode app error: %s", err)
@@ -141,11 +142,13 @@ func (wa *WebAPI) HandleUpdateApp(w http.ResponseWriter, r *http.Request) {
 	wr.WithDataOrErr(wa.UpdateApp(uid, &app))
 }
 
+// TODO: bind agent for app
+
 func (wa *WebAPI) HandleListAgentsByApp(w http.ResponseWriter, r *http.Request) {
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return
@@ -171,7 +174,7 @@ func (wa *WebAPI) HandleListRecordsByApp(w http.ResponseWriter, r *http.Request)
 	wr := httputil.NewResponse(w)
 	defer wr.Flush()
 
-	var uid = mux.Vars(r)["id"]
+	var uid = mux.Vars(r)["uid"]
 	if uid == "" {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return

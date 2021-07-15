@@ -19,8 +19,8 @@ package core
 type User struct {
 	Model
 
-	Account  string `json:"account,omitempty" yaml:"account"`
-	Token    string `json:"token,omitempty" yaml:"token"`
-	IsAdmin  bool   `json:"is_admin,omitempty" yaml:"is_admin"`
-	External string `json:"external,omitempty" yaml:"external"`
+	Account  string `json:"account" yaml:"account"`
+	Token    string `json:"token" yaml:"token"`
+	IsAdmin  bool   `json:"is_admin" yaml:"is_admin"`
+	External string `json:"external" yaml:"external"`
 }

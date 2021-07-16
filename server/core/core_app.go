@@ -16,6 +16,13 @@
 
 package core
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 // App is the application register in the server to create order
 type App struct {
 	Model
@@ -34,11 +41,29 @@ type App struct {
 	MaxPenddingOrder int `json:"max_pendding_order" yaml:"max_pendding_order"`
 
 	// TODO: with weight?
-	Agents []*Agent `gorm:"many2many:app_agents;" json:"agents" yaml:"agents"`
+	Agents []*Agent `gorm:"many2many:app_agents;ForeignKey:uid;References:uid" json:"agents" yaml:"agents"`
 
 	// TODO: belong to user
 	UserUID string `json:"user_uid" yaml:"user_uid"`
 	User    *User  `gorm:"foreignKey:UserUID" json:"user" yaml:"user"`
 }
 
+// BeforeCreate ...
+func (act *App) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
+}
+
 // TODO: customize AppAgent struct add Model<CreateAt> and weight field
+type AppAgentBind struct {
+	SimpleModel
+	AppUID   string `gorm:"primaryKey" json:"app_uid,omitempty" yaml:"app_uid"`
+	AgentUID string `gorm:"primaryKey" json:"agent_uid,omitempty" yaml:"agent_uid"`
+	Weight   uint   `json:"weight,omitempty" yaml:"weight"`
+}

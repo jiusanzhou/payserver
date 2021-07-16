@@ -195,3 +195,54 @@ func (wa *WebAPI) HandleListRecordsByApp(w http.ResponseWriter, r *http.Request)
 
 	wr.WithDataOrErr(wa.ListRecordsByApp(uid, offset, limit))
 }
+
+func (wa *WebAPI) HandleAddAgentForApp(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer wr.Flush()
+
+	var uid = mux.Vars(r)["uid"]
+	if uid == "" {
+		wr.WithCode(200).WithErrorf("app id can't be empty")
+		return
+	}
+	
+	// TODO:
+}
+
+func (wa *WebAPI) HandleUpdateAgentForApp(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer wr.Flush()
+
+	var appuid = mux.Vars(r)["app_uid"]
+	if appuid == "" {
+		wr.WithCode(200).WithErrorf("app id can't be empty")
+		return
+	}
+
+	var agentuid = mux.Vars(r)["agent_uid"]
+	if agentuid == "" {
+		wr.WithCode(200).WithErrorf("agent id can't be empty")
+		return
+	}
+
+	// TODO:
+}
+
+func (wa *WebAPI) HandleRemoveAgentFromApp(w http.ResponseWriter, r *http.Request) {
+	wr := httputil.NewResponse(w)
+	defer wr.Flush()
+
+	var appuid = mux.Vars(r)["app_uid"]
+	if appuid == "" {
+		wr.WithCode(200).WithErrorf("app id can't be empty")
+		return
+	}
+
+	var agentuid = mux.Vars(r)["agent_uid"]
+	if agentuid == "" {
+		wr.WithCode(200).WithErrorf("agent id can't be empty")
+		return
+	}
+
+	// TODO:
+}

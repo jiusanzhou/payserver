@@ -19,7 +19,6 @@ package core
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -30,57 +29,15 @@ type Model struct {
 	ID uint64 `json:"id" gorm:"primary_key;autoIncrement:true"`
 
 	// required: true
-	UID string `json:"uid" gorm:"primary_key"` // uuid?
+	UID string `json:"uid" gorm:"primary_key;type:uuid"` // uuid?
 
 	CreateAt  time.Time  `json:"create_at"`
 	UpdatedAt time.Time  `json:"update_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty" gorm:"index"`
 }
 
-// BeforeCreate ...
-func (act *App) BeforeCreate(tx *gorm.DB) error {
-	act.UID = uuid.New().String()
-
-	t := time.Now()
-
-	act.CreateAt = t
-	act.UpdatedAt = t
-
-	return nil
-}
-
-// BeforeCreate ...
-func (act *Agent) BeforeCreate(tx *gorm.DB) error {
-	act.UID = uuid.New().String()
-
-	t := time.Now()
-
-	act.CreateAt = t
-	act.UpdatedAt = t
-
-	return nil
-}
-
-// BeforeCreate ...
-func (act *Order) BeforeCreate(tx *gorm.DB) error {
-	act.UID = uuid.New().String()
-
-	t := time.Now()
-
-	act.CreateAt = t
-	act.UpdatedAt = t
-
-	return nil
-}
-
-// BeforeCreate ...
-func (act *PayRecord) BeforeCreate(tx *gorm.DB) error {
-	act.UID = uuid.New().String()
-
-	t := time.Now()
-
-	act.CreateAt = t
-	act.UpdatedAt = t
-
-	return nil
+type SimpleModel struct {
+	ID        uint64         `json:"id,omitempty" gorm:"primary_key;autoIncrement:true" yaml:"id"`
+	CreatedAt time.Time      `json:"created_at,omitempty" yaml:"created_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" yaml:"deleted_at"`
 }

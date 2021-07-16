@@ -16,7 +16,12 @@
 
 package core
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type AgentStatus int
 
@@ -58,6 +63,19 @@ type Agent struct {
 	External string `json:"external" yaml:"external"`
 
 	// Provider bind to device provider user
+	Apps []*App `gorm:"many2many:app_agents;foreignKey:UID" json:"apps" yaml:"apps"`
+}
+
+// BeforeCreate ...
+func (act *Agent) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
 }
 
 // bind agent<find by user first> with app

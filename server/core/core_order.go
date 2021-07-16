@@ -16,6 +16,13 @@
 
 package core
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 const (
 	OrderStatusPending  = iota + 1 // wait for paid
 	OrderStatusPaid                // paid
@@ -54,6 +61,18 @@ type Order struct {
 	PayRecordUID string      `json:"-" yaml:"-"`                                                  //
 	Status       OrderStatus `json:"status" yaml:"status"`                                        // order status
 	PayRecord    *PayRecord  `gorm:"foreignKey:PayRecordUID" json:"pay_record" yaml:"pay_record"` // pay record
+}
+
+// BeforeCreate ...
+func (act *Order) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
 }
 
 type PreOrder struct {

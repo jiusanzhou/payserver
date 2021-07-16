@@ -55,6 +55,9 @@ func (wa *WebAPI) Register(apiv1 *mux.Router) {
 	apiv1.HandleFunc("/app/{uid}", wa.HandleUpdateApp).Methods("POST")
 	apiv1.HandleFunc("/app/{uid}/agents", wa.HandleListAgentsByApp).Methods("GET")
 	apiv1.HandleFunc("/app/{uid}/records", wa.HandleListRecordsByApp).Methods("GET")
+	apiv1.HandleFunc("/app/{uid}/agents", wa.HandleAddAgentForApp).Methods("POST")
+	apiv1.HandleFunc("/app/{app_uid}/agent/{agent_uid}", wa.HandleUpdateAgentForApp).Methods("POST")
+	apiv1.HandleFunc("/app/{app_uid}/agent/{agent_uid}", wa.HandleRemoveAgentFromApp).Methods("DELETE")
 }
 
 func NewWebAPI(s *server.Server) *WebAPI {

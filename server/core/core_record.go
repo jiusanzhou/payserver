@@ -16,7 +16,12 @@
 
 package core
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type PayType string
 
@@ -58,4 +63,16 @@ type PayRecord struct {
 	// TODO: in the future, we can add action to scrape the record detail for agent app.
 
 	External string `json:"external" yaml:"external"`
+}
+
+// BeforeCreate ...
+func (act *PayRecord) BeforeCreate(tx *gorm.DB) error {
+	act.UID = uuid.New().String()
+
+	t := time.Now()
+
+	act.CreateAt = t
+	act.UpdatedAt = t
+
+	return nil
 }

@@ -89,12 +89,18 @@ func New(c *store.Config) (store.Storage, error) {
 	// global store the db
 	DBConn = d.DB
 
+	// TODO: auto do this
+	err = d.DB.SetupJoinTable(&core.App{}, "Agents", &core.AppAgentBind{})
+	if err != nil {
+		return nil, err
+	}
+
 	// init/create the table if we need
 	return d, d.DB.AutoMigrate(
+		&core.Account{},
 		&core.App{},
 		&core.Agent{},
 		&core.Order{},
-		&core.Account{},
 		&core.PayRecord{},
 	)
 }

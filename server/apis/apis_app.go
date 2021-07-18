@@ -205,7 +205,7 @@ func (wa *WebAPI) HandleAddAgentForApp(w http.ResponseWriter, r *http.Request) {
 		wr.WithCode(200).WithErrorf("app id can't be empty")
 		return
 	}
-	
+
 	// TODO:
 }
 

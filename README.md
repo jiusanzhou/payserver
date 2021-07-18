@@ -1,5 +1,7 @@
 <div align="center">
 
+![PayServer](./assets/logo.png)
+
 # `payserver`
 
 **A easy way to get paid.**

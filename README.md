@@ -4,7 +4,7 @@
 
 # `payserver`
 
-**A easy way to get paid.**
+**A easy way to get paid. 使用个人支付，让收款更简单。**
 
 </div>
 

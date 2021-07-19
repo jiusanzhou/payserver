@@ -10,14 +10,14 @@
 
 ---
 
-## Feature
+## Features
 
 - **Real time notification**: notify the server if device had received payment notifacatoin.
 - **Multi platforms**: both support Android and iOS.
 - **Automatically and manually**: never miss any payment notifications.
 - **Simple API**: easy to add to your own service.
 
-## Preview
+## Previews
 
 
 |Stat Pannel|Change Server|Add Server|About|

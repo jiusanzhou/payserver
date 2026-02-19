@@ -1,92 +1,69 @@
-import { NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/db/supabase"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAuth, badRequest, serverError } from "@/lib/api/auth"
-import type { Database } from "@/types/database"
+import { AgentService } from "@/lib/server"
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
-type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"]
-
-export async function GET(request: Request) {
-  const auth = await requireAuth()
-  if (!auth.authenticated) return auth.response
+// GET /api/v1/agents - List agents
+export async function GET(request: NextRequest) {
+  // Skip auth check for now (can be re-enabled for admin-only access)
+  // const auth = await requireAuth()
+  // if (!auth.authenticated) return auth.response
 
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "20")
+    const offset = parseInt(searchParams.get("offset") || "0")
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50)
     const status = searchParams.get("status")
 
-    const supabase = await createServerSupabaseClient()
-
-    let query = supabase
-      .from("agents")
-      .select("*", { count: "exact" })
-      .is("deleted_at", null)
-      .order("create_at", { ascending: false })
-      .range((page - 1) * limit, page * limit - 1)
-
+    const filters: { status?: number } = {}
     if (status) {
-      const statusMap: Record<string, number> = {
-        online: 1,
-        offline: 0,
-      }
-      query = query.eq("status", statusMap[status])
+      const statusMap: Record<string, number> = { online: 1, offline: 2, pending: 4 }
+      filters.status = statusMap[status]
     }
 
-    const { data, error, count } = await query
+    const { agents, total } = await AgentService.listAgents(offset, limit, filters)
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({
-      agents: data,
-      total: count,
-      page,
-      limit,
-    })
-  } catch {
+    return NextResponse.json({ agents, total, offset, limit })
+  } catch (err) {
+    console.error("List agents error:", err)
     return serverError()
   }
 }
 
-export async function POST(request: Request) {
-  const auth = await requireAuth()
-  if (!auth.authenticated) return auth.response
-
+// POST /api/v1/agents - Register agent (with ticket)
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { device_id, pay_types, ticket, device_info, external } = body
+    const { ticket, device_id, pay_types, device_info, external } = body
 
+    if (!ticket) {
+      return badRequest("ticket is required")
+    }
     if (!device_id) {
       return badRequest("device_id is required")
     }
+    if (!pay_types) {
+      return badRequest("pay_types is required")
+    }
 
-    const supabase = await createServerSupabaseClient()
-
-    const insertData: AgentInsert = {
+    const agent = await AgentService.registerAgent(
+      ticket,
       device_id,
-      pay_types: pay_types || "",
-      ticket: ticket || "",
-      device_info: device_info || "",
-      external: external || "",
-      status: 0,
-      heartbeat_at: new Date().toISOString(),
+      pay_types,
+      device_info,
+      external
+    )
+
+    return NextResponse.json(agent, { status: 201 })
+  } catch (err) {
+    if (err instanceof Error && "code" in err) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: (err as { code: number }).code }
+      )
     }
-
-    const { data, error } = await supabase
-      .from("agents")
-      .insert(insertData as never)
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data, { status: 201 })
-  } catch {
+    console.error("Register agent error:", err)
     return serverError()
   }
 }

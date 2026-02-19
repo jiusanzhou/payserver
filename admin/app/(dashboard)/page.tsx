@@ -18,6 +18,11 @@ import {
   AppWindow,
   TrendingUp,
 } from "lucide-react"
+import {
+  RevenueChart,
+  OrderStatsChart,
+  OrderTrendChart,
+} from "@/components/dashboard"
 
 interface Stats {
   today_orders: number
@@ -32,6 +37,12 @@ interface Order {
   sched_price: number
   status: number
   create_at: string
+}
+
+interface ChartData {
+  revenue_trend: { date: string; revenue: number }[]
+  order_stats: { status: string; count: number }[]
+  order_trend: { date: string; orders: number; paid: number }[]
 }
 
 const statusVariant: Record<number, "success" | "warning" | "secondary"> = {
@@ -55,19 +66,27 @@ export default function DashboardPage() {
     today_revenue: 0,
   })
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
+  const [chartData, setChartData] = useState<ChartData>({
+    revenue_trend: [],
+    order_stats: [],
+    order_trend: [],
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, ordersRes] = await Promise.all([
+        const [statsRes, ordersRes, chartsRes] = await Promise.all([
           fetch("/api/v1/stats"),
           fetch("/api/v1/orders?limit=5"),
+          fetch("/api/v1/stats/charts"),
         ])
         const statsData = await statsRes.json()
         const ordersData = await ordersRes.json()
+        const chartsData = await chartsRes.json()
         setStats(statsData)
         setRecentOrders(ordersData.orders || [])
+        setChartData(chartsData)
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err)
       } finally {
@@ -109,6 +128,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
           <Card key={stat.title}>
@@ -127,6 +147,68 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* Charts Row */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>收入趋势（近7天）</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                加载中...
+              </div>
+            ) : chartData.revenue_trend.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                暂无数据
+              </div>
+            ) : (
+              <RevenueChart data={chartData.revenue_trend} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>订单状态分布</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                加载中...
+              </div>
+            ) : chartData.order_stats.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                暂无数据
+              </div>
+            ) : (
+              <OrderStatsChart data={chartData.order_stats} />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Order Trend */}
+      <Card>
+        <CardHeader>
+          <CardTitle>订单趋势（近7天）</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              加载中...
+            </div>
+          ) : chartData.order_trend.length === 0 ? (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              暂无数据
+            </div>
+          ) : (
+            <OrderTrendChart data={chartData.order_trend} />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Recent Orders */}
       <Card>
         <CardHeader>
           <CardTitle>最近订单</CardTitle>

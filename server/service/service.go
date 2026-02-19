@@ -59,6 +59,10 @@ func (s *Service) Run() error {
 	s.server = server.New(s.Config, s.store)
 	s.webapi = apis.NewWebAPI(s.server)
 
+	// Start callback scheduler
+	callbackScheduler := server.NewCallbackScheduler(s.server)
+	callbackScheduler.Start()
+
 	// boostrap
 	if err = s.Boostrap(); err != nil {
 		return err
@@ -70,6 +74,9 @@ func (s *Service) Run() error {
 	})
 
 	fmt.Println("\nExit service ...")
+
+	// Stop callback scheduler
+	callbackScheduler.Stop()
 
 	// TODO: clean
 

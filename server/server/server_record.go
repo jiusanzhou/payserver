@@ -39,16 +39,16 @@ func (s *Server) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
 		log.Printf("match order error: %v", err)
 	}
 
-	// if matched, trigger callback
+	// if matched, create callback entry (scheduler will handle delivery)
 	if order != nil {
-		go s.notifyCallback(order, record)
+		go s.createCallback(order, record)
 	}
 
 	return record, nil
 }
 
-// notifyCallback sends webhook notification to app callback URL
-func (s *Server) notifyCallback(order *core.Order, record *core.PayRecord) {
+// createCallback creates a callback log entry for async delivery
+func (s *Server) createCallback(order *core.Order, record *core.PayRecord) {
 	app, err := s.store.GetApp(order.AppID)
 	if err != nil {
 		log.Printf("get app for callback error: %v", err)
@@ -69,19 +69,37 @@ func (s *Server) notifyCallback(order *core.Order, record *core.PayRecord) {
 		time.Now().Format(time.RFC3339),
 	)
 
-	// retry 3 times
-	for i := 0; i < 3; i++ {
-		resp, err := http.Post(app.CallbackURL, "application/json", strings.NewReader(payload))
-		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
-			resp.Body.Close()
-			log.Printf("callback success: order=%s app=%s", order.UID, app.Name)
-			return
-		}
+	now := time.Now()
+	cb := &core.CallbackLog{
+		OrderUID:    order.UID,
+		AppID:       app.UID,
+		CallbackURL: app.CallbackURL,
+		Payload:     payload,
+		Status:      core.CallbackStatusPending,
+		Attempts:    0,
+		MaxAttempts: core.MaxRetryAttempts,
+		NextAttempt: &now,
+	}
+
+	_, err = s.store.CreateCallback(cb)
+	if err != nil {
+		log.Printf("create callback error: %v", err)
+		// Fallback to immediate retry
+		s.notifyCallbackImmediate(app.CallbackURL, payload, order.UID)
+	}
+}
+
+// notifyCallbackImmediate is the fallback for when DB fails
+func (s *Server) notifyCallbackImmediate(url, payload, orderUID string) {
+	resp, err := (&http.Client{Timeout: 10 * time.Second}).Post(url, "application/json", strings.NewReader(payload))
+	if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		resp.Body.Close()
+		log.Printf("callback immediate success: order=%s", orderUID)
+	} else {
 		if resp != nil {
 			resp.Body.Close()
 		}
-		log.Printf("callback failed (attempt %d): order=%s err=%v", i+1, order.UID, err)
-		time.Sleep(time.Duration(i+1) * time.Second)
+		log.Printf("callback immediate failed: order=%s err=%v", orderUID, err)
 	}
 }
 

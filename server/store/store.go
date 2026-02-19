@@ -34,6 +34,7 @@ type Storage interface {
 	OrderStore
 	RecordStore
 	AppStore
+	CallbackStore
 }
 
 type AgentStore interface {
@@ -71,6 +72,15 @@ type AppStore interface {
 	UpdateApp(app *core.App) (*core.App, error)
 	DeleteApp(id string) error
 	ListApps(offset, limit int, query ...interface{}) ([]*core.App, error)
+}
+
+type CallbackStore interface {
+	CreateCallback(cb *core.CallbackLog) (*core.CallbackLog, error)
+	UpdateCallback(cb *core.CallbackLog) (*core.CallbackLog, error)
+	GetCallback(id string) (*core.CallbackLog, error)
+	GetCallbackByOrder(orderUID string) (*core.CallbackLog, error)
+	ListPendingCallbacks(limit int) ([]*core.CallbackLog, error)
+	ListCallbacksByOrder(orderUID string) ([]*core.CallbackLog, error)
 }
 
 // ===========================================================

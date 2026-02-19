@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"go.zoe.im/payserver/server/core"
 	"go.zoe.im/payserver/server/utils"
@@ -33,6 +34,40 @@ var (
 	ErrNoAviableAgent       = errors.New("no aviable agent")
 	ErrSchedPriceBusy       = errors.New("sched price busy")
 )
+
+// selectAgentByWeight selects an agent based on weights
+func selectAgentByWeight(agents []*core.Agent, weights []uint) *core.Agent {
+	if len(agents) == 0 {
+		return nil
+	}
+	if len(agents) == 1 {
+		return agents[0]
+	}
+
+	// Calculate total weight
+	var totalWeight uint
+	for _, w := range weights {
+		if w == 0 {
+			w = 1
+		}
+		totalWeight += w
+	}
+
+	// Random selection
+	r := uint(rand.Intn(int(totalWeight)))
+	var cumulative uint
+	for i, w := range weights {
+		if w == 0 {
+			w = 1
+		}
+		cumulative += w
+		if r < cumulative {
+			return agents[i]
+		}
+	}
+
+	return agents[len(agents)-1]
+}
 
 func (s *Server) IsSupportedPayType(method string) bool {
 	return core.IsSupportedPayType(method)
@@ -77,11 +112,14 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 		return nil, ErrOrderNumberExits
 	}
 
-	// random choose an agent
+	// random choose an agent with weight
 	var agents []*core.Agent
+	var weights []uint
 	for _, a := range app.Agents {
 		if a.Status == core.AgentStatusNormal {
 			agents = append(agents, a)
+			// TODO: get weight from AppAgentBind, default to 1
+			weights = append(weights, 1)
 		}
 	}
 
@@ -89,9 +127,8 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 		return nil, ErrNoAviableAgent
 	}
 
-	// TODO: with weight ?
-	// random choose a agent
-	agent := agents[rand.Intn(len(agents))]
+	// weighted random selection
+	agent := selectAgentByWeight(agents, weights)
 	// TODO: log chooseen the agent
 
 	// ok, let's generate the key, first search agent by appid
@@ -223,4 +260,24 @@ func (s *Server) MatchOrderByRecord(record *core.PayRecord) (*core.Order, error)
 // ListOrders lists orders with optional filters
 func (s *Server) ListOrders(offset, limit int, query ...interface{}) ([]*core.Order, error) {
 	return s.store.ListOrders(offset, limit, query...)
+}
+
+// GetCallbackStatus returns callback info for an order
+func (s *Server) GetCallbackStatus(orderUID string) (*core.CallbackLog, error) {
+	return s.store.GetCallbackByOrder(orderUID)
+}
+
+// RetryCallback manually retries a failed callback
+func (s *Server) RetryCallback(orderUID string) (*core.CallbackLog, error) {
+	cb, err := s.store.GetCallbackByOrder(orderUID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reset for retry
+	now := time.Now()
+	cb.Status = core.CallbackStatusPending
+	cb.NextAttempt = &now
+
+	return s.store.UpdateCallback(cb)
 }

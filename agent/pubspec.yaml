@@ -16,11 +16,10 @@ dependencies:
   cupertino_icons: ^1.0.6
 
   # State Management
-  flutter_riverpod: ^2.4.9
-  riverpod_annotation: ^2.3.3
+  flutter_riverpod: ^2.6.1
 
   # Database
-  drift: ^2.14.1
+  drift: ^2.21.0
   sqlite3_flutter_libs: ^0.5.18
   path_provider: ^2.1.2
   path: ^1.8.3
@@ -30,18 +29,18 @@ dependencies:
   fl_chart: ^0.66.0
 
   # QR
-  mobile_scanner: ^5.1.1
+  mobile_scanner: ^5.2.3
   qr_flutter: ^4.1.0
 
   # Utils
   shared_preferences: ^2.2.2
   synchronized: ^3.1.0
-  freezed_annotation: ^2.4.1
+  freezed_annotation: ^2.4.4
   json_annotation: ^4.8.1
   http: ^1.1.2
 
   # Background work
-  workmanager: ^0.5.2
+  workmanager: ^0.6.0
 
   # Notification listener
   flutter_notification_listener: ^1.4.0
@@ -52,9 +51,9 @@ dev_dependencies:
 
   # Code generation
   build_runner: ^2.4.8
-  drift_dev: ^2.14.1
+  drift_dev: ^2.21.0
   riverpod_generator: ^2.3.9
-  freezed: ^2.4.6
+  freezed: ^2.5.2
   json_serializable: ^6.7.1
 
   # Splash & Icons

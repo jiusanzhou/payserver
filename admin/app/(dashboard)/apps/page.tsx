@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/utils"
 import { RefreshCw, Plus, Trash2, Settings, Copy, Eye, EyeOff } from "lucide-react"
+import { AgentManager } from "@/components/dashboard"
 
 interface App {
   uid: string
@@ -45,6 +46,8 @@ export default function AppsPage() {
   const [loading, setLoading] = useState(true)
   const [showSecret, setShowSecret] = useState<Record<string, boolean>>({})
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [managerOpen, setManagerOpen] = useState(false)
+  const [selectedApp, setSelectedApp] = useState<App | null>(null)
   const [newApp, setNewApp] = useState({
     name: "",
     callback_url: "",
@@ -294,7 +297,14 @@ export default function AppsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedApp(app)
+                            setManagerOpen(true)
+                          }}
+                        >
                           <Settings className="h-4 w-4" />
                         </Button>
                         <Button
@@ -314,6 +324,17 @@ export default function AppsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Agent Manager Dialog */}
+      {selectedApp && (
+        <AgentManager
+          appUid={selectedApp.uid}
+          appName={selectedApp.name}
+          open={managerOpen}
+          onOpenChange={setManagerOpen}
+          onUpdate={fetchApps}
+        />
+      )}
     </div>
   )
 }

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/utils"
 import { RefreshCw, Trash2, Smartphone, Wifi, WifiOff } from "lucide-react"
+import { AgentBindQR } from "@/components/dashboard"
 
 interface Agent {
   uid: string
@@ -97,10 +98,13 @@ export default function AgentsPage() {
           <h1 className="text-2xl font-bold tracking-tight">设备管理</h1>
           <p className="text-muted-foreground">管理收款设备 (Agent)</p>
         </div>
-        <Button onClick={fetchAgents} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          刷新
-        </Button>
+        <div className="flex items-center space-x-2">
+          <AgentBindQR onSuccess={fetchAgents} />
+          <Button onClick={fetchAgents} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            刷新
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

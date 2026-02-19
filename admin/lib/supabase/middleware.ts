@@ -43,8 +43,26 @@ export async function updateSession(request: NextRequest) {
   )
 
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
-  const publicApiRoutes = ['/api/health', '/api/v1/auth']
-  const isPublicApi = publicApiRoutes.some(path => request.nextUrl.pathname.startsWith(path))
+  const publicApiRoutes = [
+    '/api/health',
+    '/api/v1/auth',
+    '/api/v1/order',        // External app creates orders
+    '/api/v1/records',      // Agent posts records
+    '/api/v1/agents',       // Agent registration
+    '/api/v1/agent/prepare', // Agent prepare
+    '/api/v1/apps',         // App management (dev mode)
+    '/api/v1/app',          // App detail/update (dev mode)
+  ]
+  const isPublicApi = publicApiRoutes.some(path => 
+    request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path)
+  )
+  
+  // Agent API routes (authenticated by ticket/uid, not user session)
+  const agentApiPatterns = [
+    /^\/api\/v1\/agent\/[^/]+\/heartbeat$/,
+    /^\/api\/v1\/agent\/[^/]+$/,
+  ]
+  const isAgentApi = agentApiPatterns.some(pattern => pattern.test(request.nextUrl.pathname))
 
   if (!user && isProtectedPath) {
     const url = request.nextUrl.clone()
@@ -52,7 +70,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (!user && isApiRoute && !isPublicApi) {
+  if (!user && isApiRoute && !isPublicApi && !isAgentApi) {
     return NextResponse.json(
       { error: 'Unauthorized', message: 'Authentication required' },
       { status: 401 }

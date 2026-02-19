@@ -102,6 +102,7 @@ func New(c *store.Config) (store.Storage, error) {
 		&core.Agent{},
 		&core.Order{},
 		&core.PayRecord{},
+		&core.CallbackLog{},
 	)
 }
 

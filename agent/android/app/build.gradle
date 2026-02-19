@@ -24,7 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "im.zoe.side.payagent"
-    compileSdk 34
+    compileSdk 36
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

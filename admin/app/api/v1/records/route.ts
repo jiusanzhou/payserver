@@ -1,72 +1,45 @@
-import { NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/db/supabase"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAuth, badRequest, serverError } from "@/lib/api/auth"
-import type { Database } from "@/types/database"
+import { RecordService } from "@/lib/server"
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
-type RecordInsert = Database["public"]["Tables"]["pay_records"]["Insert"]
-
-export async function GET(request: Request) {
+// GET /api/v1/records - List records
+export async function GET(request: NextRequest) {
   const auth = await requireAuth()
   if (!auth.authenticated) return auth.response
 
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "20")
+    const offset = parseInt(searchParams.get("offset") || "0")
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50)
     const type = searchParams.get("type")
     const agent_uid = searchParams.get("agent_uid")
 
-    const supabase = await createServerSupabaseClient()
+    const filters: { type?: string; agentUid?: string } = {}
+    if (type) filters.type = type
+    if (agent_uid) filters.agentUid = agent_uid
 
-    let query = supabase
-      .from("pay_records")
-      .select("*", { count: "exact" })
-      .is("deleted_at", null)
-      .order("create_at", { ascending: false })
-      .range((page - 1) * limit, page * limit - 1)
+    const { records, total } = await RecordService.listRecords(offset, limit, filters)
 
-    if (type) {
-      query = query.eq("type", type)
-    }
-
-    if (agent_uid) {
-      query = query.eq("agent_uid", agent_uid)
-    }
-
-    const { data, error, count } = await query
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({
-      records: data,
-      total: count,
-      page,
-      limit,
-    })
-  } catch {
+    return NextResponse.json({ records, total, offset, limit })
+  } catch (err) {
+    console.error("List records error:", err)
     return serverError()
   }
 }
 
-export async function POST(request: Request) {
-  const auth = await requireAuth()
-  if (!auth.authenticated) return auth.response
-
+// POST /api/v1/records - Create record (from Agent app)
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { agent_uid, type, number, amount, timestamp, account_uid, external } = body
 
-    if (!agent_uid || !type || !number || !amount) {
+    if (!agent_uid || !type || !number || amount === undefined) {
       return badRequest("agent_uid, type, number, amount are required")
     }
 
-    const supabase = await createServerSupabaseClient()
-
-    const insertData: RecordInsert = {
+    const record = await RecordService.createRecord({
       agent_uid,
       type,
       number,
@@ -74,20 +47,17 @@ export async function POST(request: Request) {
       timestamp: timestamp || new Date().toISOString(),
       account_uid: account_uid || "",
       external: external || "",
+    })
+
+    return NextResponse.json(record, { status: 201 })
+  } catch (err) {
+    if (err instanceof Error && "code" in err) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: (err as { code: number }).code }
+      )
     }
-
-    const { data, error } = await supabase
-      .from("pay_records")
-      .insert(insertData as never)
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data, { status: 201 })
-  } catch {
+    console.error("Create record error:", err)
     return serverError()
   }
 }

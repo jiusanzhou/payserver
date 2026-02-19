@@ -95,6 +95,7 @@ func New(c *store.Config) (store.Storage, error) {
 		&core.Agent{},
 		&core.Order{},
 		&core.PayRecord{},
+		&core.CallbackLog{},
 	)
 }
 
@@ -322,4 +323,41 @@ func (d *driver) DeleteRecord(uid string) error {
 		return store.ErrMissObjectID
 	}
 	return d.Where("uid = ?", uid).Delete(&core.PayRecord{}).Error
+}
+
+// ==================== CallbackStore ====================
+
+func (d *driver) CreateCallback(cb *core.CallbackLog) (*core.CallbackLog, error) {
+	return cb, d.Create(cb).Error
+}
+
+func (d *driver) UpdateCallback(cb *core.CallbackLog) (*core.CallbackLog, error) {
+	if cb.UID == "" {
+		return nil, store.ErrMissObjectID
+	}
+	return cb, d.Model(cb).Where("uid = ?", cb.UID).Updates(cb).Error
+}
+
+func (d *driver) GetCallback(uid string) (*core.CallbackLog, error) {
+	var cb core.CallbackLog
+	return &cb, d.Where("uid = ?", uid).First(&cb).Error
+}
+
+func (d *driver) GetCallbackByOrder(orderUID string) (*core.CallbackLog, error) {
+	var cb core.CallbackLog
+	return &cb, d.Where("order_uid = ?", orderUID).Order("created_at DESC").First(&cb).Error
+}
+
+func (d *driver) ListPendingCallbacks(limit int) ([]*core.CallbackLog, error) {
+	var cbs []*core.CallbackLog
+	now := time.Now()
+	return cbs, d.Where("status = ? AND next_attempt <= ?", core.CallbackStatusPending, now).
+		Order("next_attempt ASC").
+		Limit(limit).
+		Find(&cbs).Error
+}
+
+func (d *driver) ListCallbacksByOrder(orderUID string) ([]*core.CallbackLog, error) {
+	var cbs []*core.CallbackLog
+	return cbs, d.Where("order_uid = ?", orderUID).Order("created_at DESC").Find(&cbs).Error
 }

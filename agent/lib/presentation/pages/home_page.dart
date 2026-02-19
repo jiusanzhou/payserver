@@ -88,7 +88,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                           TextButton(
                             onPressed: () {
-                              // TODO: 跳转到收款记录
+                              Navigator.pushNamed(context, '/analytics');
                             },
                             child: const Text('查看全部'),
                           ),
@@ -257,8 +257,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
     }
 
-    // Refresh stats
+    // Refresh stats and list
     ref.invalidate(tp.transactionStatsProvider);
+    ref.invalidate(tp.transactionListProvider);
   }
 
   Widget _buildStatusHeader(

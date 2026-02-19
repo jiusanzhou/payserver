@@ -44,6 +44,12 @@ PayServer 是一个完整的个人收款解决方案，由三个核心组件组�
                     └─────────────┘
 ```
 
+## 预览
+
+|开始|选择服务|添加服务|关于|
+|:---:|:---:|:---:|:---:|
+|![Stat Pannel](./assets/home.jpg)|![Change Server](./assets/server-selector.jpg)|![Add Server](./assets/edit-server.jpg)|![About](./assets/about.jpg)|
+
 ## 快速开始
 
 ### Server

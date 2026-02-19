@@ -69,6 +69,8 @@ void _notificationCallback(NotificationEvent evt) {
 class PaymentListenerService {
   final Ref ref;
   ReceivePort? _receivePort;
+  StreamSubscription? _receivePortSubscription;
+  StreamSubscription? _pluginPortSubscription;
   Timer? _heartbeatTimer;
   bool _isRunning = false;
 
@@ -90,27 +92,27 @@ class PaymentListenerService {
     // Initialize notification listener with static callback
     NotificationsListener.initialize(callbackHandle: _notificationCallback);
 
+    // Clean up existing port mapping and subscriptions
+    _cleanupPorts();
+
     // Setup receive port to get events from background isolate
     _receivePort = ReceivePort();
-    IsolateNameServer.removePortNameMapping(_isolatePortName);
     IsolateNameServer.registerPortWithName(
       _receivePort!.sendPort,
       _isolatePortName,
     );
 
-    // Listen to events from background
-    _receivePort!.listen((dynamic evt) {
+    // Listen to events from our custom isolate port
+    _receivePortSubscription = _receivePort!.listen((dynamic evt) {
       if (evt is NotificationEvent) {
         _onNotification(evt);
       }
     });
 
-    // Also listen to receivePort for UI thread events
-    NotificationsListener.receivePort?.listen((evt) {
-      if (evt is NotificationEvent) {
-        _onNotification(evt);
-      }
-    });
+    // Note: We don't listen to NotificationsListener.receivePort here
+    // because it's a single-subscription stream that may already be listened to.
+    // The plugin's static callback (_notificationCallback) sends events to our
+    // custom isolate port via IsolateNameServer, so we only need to listen there.
 
     // Start the service
     final isRunning = await NotificationsListener.isRunning ?? false;
@@ -133,11 +135,20 @@ class PaymentListenerService {
     return true;
   }
 
-  /// Stop the service
-  void stop() {
+  /// Clean up ports and subscriptions
+  void _cleanupPorts() {
+    _receivePortSubscription?.cancel();
+    _receivePortSubscription = null;
+    _pluginPortSubscription?.cancel();
+    _pluginPortSubscription = null;
     _receivePort?.close();
     _receivePort = null;
     IsolateNameServer.removePortNameMapping(_isolatePortName);
+  }
+
+  /// Stop the service
+  void stop() {
+    _cleanupPorts();
     _heartbeatTimer?.cancel();
     _heartbeatTimer = null;
     NotificationsListener.stopService();

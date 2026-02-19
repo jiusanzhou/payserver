@@ -86,3 +86,66 @@ func (s *Server) ListApps(offset, limit int) ([]*core.App, error) {
 func (s *Server) ListAppsByAgent(id string, offset, limit int) ([]*core.App, error) {
 	return s.store.ListApps(offset, limit, "agent_uid = ?", id)
 }
+
+// BindAgentToApp binds an agent to an app with optional weight
+func (s *Server) BindAgentToApp(appID, agentID string, weight uint) error {
+	app, err := s.store.GetApp(appID)
+	if err != nil {
+		return ErrAppNotFound
+	}
+
+	agent, err := s.store.GetAgent(agentID)
+	if err != nil {
+		return ErrNoAviableAgent
+	}
+
+	// check if already bound
+	for _, a := range app.Agents {
+		if a.UID == agentID {
+			return nil // already bound
+		}
+	}
+
+	app.Agents = append(app.Agents, agent)
+	_, err = s.store.UpdateApp(app)
+	return err
+}
+
+// UnbindAgentFromApp removes an agent from an app
+func (s *Server) UnbindAgentFromApp(appID, agentID string) error {
+	app, err := s.store.GetApp(appID)
+	if err != nil {
+		return ErrAppNotFound
+	}
+
+	var newAgents []*core.Agent
+	for _, a := range app.Agents {
+		if a.UID != agentID {
+			newAgents = append(newAgents, a)
+		}
+	}
+	app.Agents = newAgents
+
+	_, err = s.store.UpdateApp(app)
+	return err
+}
+
+// ListAgentsByApp lists agents bound to an app
+func (s *Server) ListAgentsByApp(appID string, offset, limit int) ([]*core.Agent, error) {
+	app, err := s.store.GetApp(appID)
+	if err != nil {
+		return nil, ErrAppNotFound
+	}
+
+	// apply pagination
+	start := offset
+	if start > len(app.Agents) {
+		return []*core.Agent{}, nil
+	}
+	end := start + limit
+	if end > len(app.Agents) {
+		end = len(app.Agents)
+	}
+
+	return app.Agents[start:end], nil
+}

@@ -25,6 +25,8 @@ import (
 	"go.zoe.im/payserver/server/service"
 
 	_ "go.zoe.im/payserver/server/store/msql"
+	_ "go.zoe.im/payserver/server/store/postgres"
+	_ "go.zoe.im/payserver/server/store/supabase"
 )
 
 func main() {

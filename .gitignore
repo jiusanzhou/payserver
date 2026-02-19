@@ -1,1 +1,45 @@
 .DS_Store
+*.log
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+.pnpm-store/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/server/server
+/server/.env
+
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+*.lock
+!pubspec.lock
+!pnpm-lock.yaml
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Generated
+*.g.dart
+*.freezed.dart
+*.gen.dart
+
+# Environment
+.env
+.env.local
+.env.*.local

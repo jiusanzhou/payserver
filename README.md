@@ -31,7 +31,33 @@
 
 `TODO`
 
+## 文档
+
+| 文档 | 说明 |
+|------|------|
+| [架构设计](./docs/ARCHITECTURE.md) | 系统整体架构设计 |
+| [Admin Dashboard 设计](./docs/ADMIN_DESIGN.md) | Next.js 管理后台设计 |
+| [存储层设计](./docs/STORAGE_DESIGN.md) | 插件化数据库架构 |
+| [Agent 升级设计](./docs/AGENT_DESIGN.md) | Flutter 端升级方案 |
+| [API 规范](./docs/API.md) | RESTful API 接口文档 |
+
+## 技术栈
+
+### 后端
+- **Go Backend**: 核心业务 API (gorilla/mux + GORM)
+- **Next.js**: 管理后台 + BFF API
+
+### 移动端
+- **Flutter**: 数据采集 Agent
+
+### 数据库
+- **Supabase** (首选): 云端 PostgreSQL + Auth + Realtime
+- **PostgreSQL / MySQL**: 自托管备选
+
 ## TODO
 
 - [ ] 收款订单统计与分析报表
 - [ ] 手动标记订单
+- [ ] Next.js Admin Dashboard 实现
+- [ ] 多数据库存储层插件
+- [ ] Flutter Agent 升级到 3.x

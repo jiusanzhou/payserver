@@ -206,7 +206,22 @@ func (wa *WebAPI) HandleAddAgentForApp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO:
+	// parse request body for agent_uid and weight
+	var req struct {
+		AgentUID string `json:"agent_uid"`
+		Weight   uint   `json:"weight"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		wr.WithCode(101).WithErrorf("decode request error: %s", err)
+		return
+	}
+
+	if req.AgentUID == "" {
+		wr.WithCode(201).WithErrorf("agent_uid is required")
+		return
+	}
+
+	wr.WithError(wa.BindAgentToApp(uid, req.AgentUID, req.Weight))
 }
 
 func (wa *WebAPI) HandleUpdateAgentForApp(w http.ResponseWriter, r *http.Request) {
@@ -225,7 +240,17 @@ func (wa *WebAPI) HandleUpdateAgentForApp(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// TODO:
+	// parse weight from body
+	var req struct {
+		Weight uint `json:"weight"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		wr.WithCode(101).WithErrorf("decode request error: %s", err)
+		return
+	}
+
+	// rebind with new weight
+	wr.WithError(wa.BindAgentToApp(appuid, agentuid, req.Weight))
 }
 
 func (wa *WebAPI) HandleRemoveAgentFromApp(w http.ResponseWriter, r *http.Request) {
@@ -244,5 +269,5 @@ func (wa *WebAPI) HandleRemoveAgentFromApp(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO:
+	wr.WithError(wa.UnbindAgentFromApp(appuid, agentuid))
 }

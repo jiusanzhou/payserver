@@ -54,6 +54,15 @@ func (d driver) GetOrderByAppAndNumber(appid string, num string) (*core.Order, e
 }
 
 func (d driver) GetOrdersByApp(appid string, statuss ...core.OrderStatus) ([]*core.Order, error) {
+	var orders []*core.Order
+	query := d.Where("app_id = ?", appid)
+	if len(statuss) > 0 {
+		query = query.Where("status IN ?", statuss)
+	}
+	return orders, query.Find(&orders).Error
+}
 
-	return nil, store.ErrNoImplement
+func (d driver) ListOrders(offset, limit int, query ...interface{}) ([]*core.Order, error) {
+	var orders []*core.Order
+	return orders, d.Where(query).Offset(offset).Limit(limit).Order("created_at DESC").Find(&orders).Error
 }

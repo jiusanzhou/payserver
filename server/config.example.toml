@@ -1,5 +1,19 @@
 addr = ":30911"
 
+# Database configuration
+# Supported schemes:
+# - sqlite3://path/to/file.db (default, for development)
+# - mysql://user:pass@tcp(localhost:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+# - postgres://user:pass@localhost:5432/dbname?sslmode=disable
+# - postgresql://user:pass@localhost:5432/dbname?sslmode=disable
+# - supabase://user:pass@db.xxx.supabase.co:5432/postgres (recommended for production)
+db = "sqlite3://payserver.db"
+
+# Example database configurations:
+# db = "mysql://root:password@tcp(localhost:3306)/payserver?charset=utf8mb4&parseTime=True&loc=Local"
+# db = "postgres://postgres:password@localhost:5432/payserver?sslmode=disable"
+# db = "supabase://postgres.xxx:password@db.xxx.supabase.co:5432/postgres"
+
 debug = true
 http_allow_origin = false
 

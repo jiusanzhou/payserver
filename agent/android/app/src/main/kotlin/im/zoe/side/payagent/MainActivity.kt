@@ -1,4 +1,4 @@
-package com.example.agent
+package im.zoe.side.payagent
 
 import io.flutter.embedding.android.FlutterActivity
 

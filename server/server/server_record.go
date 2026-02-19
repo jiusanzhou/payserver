@@ -16,10 +16,73 @@
 
 package server
 
-import "go.zoe.im/payserver/server/core"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+
+	"go.zoe.im/payserver/server/core"
+)
 
 func (s *Server) CreateRecord(rd *core.PayRecord) (*core.PayRecord, error) {
-	return s.store.CreateRecord(rd)
+	// save record first
+	record, err := s.store.CreateRecord(rd)
+	if err != nil {
+		return nil, err
+	}
+
+	// try to match with pending order
+	order, err := s.MatchOrderByRecord(record)
+	if err != nil {
+		log.Printf("match order error: %v", err)
+	}
+
+	// if matched, trigger callback
+	if order != nil {
+		go s.notifyCallback(order, record)
+	}
+
+	return record, nil
+}
+
+// notifyCallback sends webhook notification to app callback URL
+func (s *Server) notifyCallback(order *core.Order, record *core.PayRecord) {
+	app, err := s.store.GetApp(order.AppID)
+	if err != nil {
+		log.Printf("get app for callback error: %v", err)
+		return
+	}
+
+	if app.CallbackURL == "" {
+		return
+	}
+
+	// build callback payload
+	payload := fmt.Sprintf(`{"order_id":"%s","number":"%s","status":"paid","amount":%d,"pay_type":"%s","record_id":"%s","timestamp":"%s"}`,
+		order.UID,
+		order.PreOrder.Number,
+		order.SchedPrice,
+		order.SchedPayType,
+		record.UID,
+		time.Now().Format(time.RFC3339),
+	)
+
+	// retry 3 times
+	for i := 0; i < 3; i++ {
+		resp, err := http.Post(app.CallbackURL, "application/json", strings.NewReader(payload))
+		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
+			resp.Body.Close()
+			log.Printf("callback success: order=%s app=%s", order.UID, app.Name)
+			return
+		}
+		if resp != nil {
+			resp.Body.Close()
+		}
+		log.Printf("callback failed (attempt %d): order=%s err=%v", i+1, order.UID, err)
+		time.Sleep(time.Duration(i+1) * time.Second)
+	}
 }
 
 func (s *Server) GetRecord(uid string) (*core.PayRecord, error) {

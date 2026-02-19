@@ -41,9 +41,13 @@ func (s *Server) IsSupportedPayType(method string) bool {
 // CreateOrder create the order from backend service
 func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*core.Order, error) {
 
-	// TODO: if method is empty, choose a available one
-	// if method is not empty, we should check first
-	if method != "" || !s.IsSupportedPayType(method) {
+	// if method is empty, default to wechat
+	if method == "" {
+		method = string(core.PayTypeWeChat)
+	}
+
+	// validate pay method
+	if !s.IsSupportedPayType(method) {
 		return nil, ErrUnsupportedPayMethod
 	}
 
@@ -95,21 +99,20 @@ func (s *Server) CreateOrder(appid, method string, preorder *core.PreOrder) (*co
 	// <floor> ... <ceil>
 	// random to choose an agent for app and which is not busying(arrive the max pendding)
 
-	prefix := fmt.Sprintf("%v-%v", agent.UID, method)
-
 	// check which one is not exits
 	// gen the prices array
 	var found bool
 	var price int
+	var schedKey string
 
 	s.Lock()
 	for _, i := range utils.GenPriceFloats(app.PriceFloor, app.PriceCeil) {
-		price = i + preorder.Price
-		key := fmt.Sprintf("%v-%v", prefix, price)
-		if _, ok := s.uniqueIDs[key]; !ok {
+		price = preorder.Price + i
+		schedKey = fmt.Sprintf("%v-%v-%v", agent.UID, method, price)
+		if _, ok := s.uniqueIDs[schedKey]; !ok {
 			found = true
-			s.uniqueIDs[key] = true
-			found = true
+			s.uniqueIDs[schedKey] = true
+			break
 		}
 	}
 	s.Unlock()
@@ -159,13 +162,65 @@ func (s *Server) GetOrderStatus(uid string) (core.OrderStatus, error) {
 }
 
 func (s *Server) CancelOrder(uid string) (*core.Order, error) {
+	// get order first to release schedKey
+	order, err := s.store.GetOrder(uid)
+	if err != nil {
+		return nil, err
+	}
 
-	// cancel the order, just set the tatus to cancled
-	// adn notify clients
-	return s.store.UpdateOrder(&core.Order{
-		Model: core.Model{UID: uid},
-		// set the status
-		Status: core.OrderStatusExpired, // make sure only update this field
-	})
-	// TODO: notify all clients
+	// only pending orders can be canceled
+	if order.Status != core.OrderStatusPending {
+		return order, nil
+	}
+
+	// release the schedKey
+	schedKey := fmt.Sprintf("%v-%v-%v", order.SchedAgentUID, order.SchedPayType, order.SchedPrice)
+	s.Lock()
+	delete(s.uniqueIDs, schedKey)
+	s.Unlock()
+
+	// update status
+	order.Status = core.OrderStatusCanceled
+	return s.store.UpdateOrder(order)
+}
+
+// MatchOrderByRecord matches a pay record to a pending order
+func (s *Server) MatchOrderByRecord(record *core.PayRecord) (*core.Order, error) {
+	// generate schedKey from record
+	schedKey := fmt.Sprintf("%v-%v-%v", record.AgentUID, record.Type, record.Amount)
+
+	// check if schedKey exists
+	s.RLock()
+	exists := s.uniqueIDs[schedKey]
+	s.RUnlock()
+
+	if !exists {
+		return nil, nil // no matching order
+	}
+
+	// find the pending order with this sched
+	orders, err := s.store.ListOrders(0, 1,
+		"sched_agent_uid = ? AND sched_pay_type = ? AND sched_price = ? AND status = ?",
+		record.AgentUID, record.Type, record.Amount, core.OrderStatusPending)
+	if err != nil || len(orders) == 0 {
+		return nil, err
+	}
+
+	order := orders[0]
+
+	// release schedKey
+	s.Lock()
+	delete(s.uniqueIDs, schedKey)
+	s.Unlock()
+
+	// update order status
+	order.Status = core.OrderStatusPaid
+	order.PayRecordUID = record.UID
+
+	return s.store.UpdateOrder(order)
+}
+
+// ListOrders lists orders with optional filters
+func (s *Server) ListOrders(offset, limit int, query ...interface{}) ([]*core.Order, error) {
+	return s.store.ListOrders(offset, limit, query...)
 }

@@ -53,6 +53,7 @@ type OrderStore interface {
 	GetOrder(id string) (*core.Order, error)
 	GetOrderByAppAndNumber(appid string, num string) (*core.Order, error)
 	GetOrdersByApp(appid string, statuss ...core.OrderStatus) ([]*core.Order, error)
+	ListOrders(offset, limit int, query ...interface{}) ([]*core.Order, error)
 }
 
 type RecordStore interface {

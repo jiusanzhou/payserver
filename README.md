@@ -29,13 +29,15 @@ PayServer 是一个完整的个人收款解决方案，由三个核心组件组�
 - 🎛️ **管理后台** - 现代化 Next.js Dashboard
 - 🔐 **安全认证** - JWT + Supabase Auth
 - 🚀 **易于部署** - 支持 SaaS 和自托管
+- ✍️ **手动录入** - 支持手动补录收款记录
+- 🔋 **后台保活** - 支持电池优化白名单和开机自启
 
 ## 架构
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Agent     │────▶│   Server    │◀────│   Admin     │
-│  (Flutter)  │     │    (Go)     │     │  (Next.js)  │
+│  (Flutter)  │     │  (Next.js)  │     │  (Next.js)  │
 └─────────────┘     └──────┬──────┘     └─────────────┘
                            │
                     ┌──────▼──────┐
@@ -52,16 +54,7 @@ PayServer 是一个完整的个人收款解决方案，由三个核心组件组�
 
 ## 快速开始
 
-### Server
-
-```bash
-cd server
-cp .env.example .env
-# 编辑 .env 配置数据库连接
-go run main.go
-```
-
-### Admin
+### Admin (含 API 服务)
 
 ```bash
 cd admin
@@ -79,24 +72,92 @@ flutter pub get
 flutter run
 ```
 
+### Server (可选，Go 后端)
+
+```bash
+cd server
+cp .env.example .env
+# 编辑 .env 配置数据库连接
+go run main.go
+```
+
+## 核心功能
+
+### 订单流程
+
+1. **创建订单** - 外部应用通过 API 创建待支付订单
+2. **调度 Agent** - 系统自动选择可用 Agent 和支付方式
+3. **监听收款** - Agent 监听支付宝/微信收款通知
+4. **自动匹配** - 收款记录与待支付订单自动匹配
+5. **回调通知** - 支付成功后触发 Webhook 回调
+
+### 手动录入
+
+- Admin 后台：收款记录页面支持手动录入
+- Agent 端：首页 FAB 按钮支持手动录入收款
+- 支持选择支付渠道（微信/支付宝）和输入金额
+
+### 后台保活
+
+Agent 支持以下保活机制：
+- 前台服务通知
+- 电池优化白名单
+- 开机自动启动
+- 定时心跳上报
+
 ## 项目结构
 
 ```
 payserver/
-├── server/          # Go 后端
+├── server/          # Go 后端 (可选)
 │   ├── apis/        # HTTP handlers
 │   ├── core/        # 核心业务逻辑
 │   ├── server/      # HTTP server
 │   └── store/       # 存储层 (postgres/supabase/mysql)
-├── admin/           # Next.js 管理后台
+├── admin/           # Next.js 管理后台 + API
 │   ├── app/         # App Router
 │   ├── components/  # UI 组件
-│   └── lib/         # 工具库
+│   └── lib/         # 服务层 + 工具库
 ├── agent/           # Flutter 移动端
-│   ├── lib/core/    # 核心服务
-│   ├── lib/data/    # 数据层
-│   └── lib/presentation/  # UI
+│   ├── lib/core/    # 核心服务 (监听/电池)
+│   ├── lib/data/    # 数据层 (API/数据库)
+│   └── lib/presentation/  # UI (页面/组件)
 └── docs/            # 文档
+```
+
+## API 示例
+
+### 创建订单
+
+```bash
+curl -X POST "http://localhost:3000/api/v1/order?appid=YOUR_APP_ID&method=wechat" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "number": "ORDER-001",
+    "name": "测试商品",
+    "price": 1999,
+    "redirect_url": "https://example.com/success"
+  }'
+```
+
+### 上报收款 (Agent)
+
+```bash
+curl -X POST "http://localhost:3000/api/v1/records" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_uid": "YOUR_AGENT_UID",
+    "type": "wechat",
+    "amount": 1999,
+    "number": "WX-PAY-001"
+  }'
+```
+
+### 查询订单状态
+
+```bash
+curl "http://localhost:3000/api/v1/order/ORDER_UID/status"
+# 返回: {"status": 2}  // 1=pending, 2=paid, 3=expired, 4=canceled
 ```
 
 ## 文档
@@ -124,10 +185,14 @@ payserver/
 - [x] 插件化存储层
 - [x] Flutter Agent 通知监听
 - [x] Next.js Admin 基础框架
+- [x] Next.js API 服务层
+- [x] 手动录入收款记录
+- [x] Agent 后台保活 (电池优化/开机启动)
+- [x] 收款记录列表页
 - [ ] Admin Dashboard 数据可视化
 - [ ] Agent 扫码绑定
-- [ ] Webhook 重试机制
-- [ ] 多 Agent 管理
+- [ ] Webhook 重试调度器
+- [ ] 多 Agent 负载均衡
 
 ## License
 

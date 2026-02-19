@@ -71,7 +71,7 @@ class _AnimatedRingState extends State<AnimatedRing>
             size: Size(widget.size, widget.size),
             painter: _RingBackgroundPainter(
               strokeWidth: widget.strokeWidth,
-              color: widget.inactiveColor.withOpacity(0.3),
+              color: widget.inactiveColor.withAlpha(77),
             ),
           ),
           // 动画圆环
@@ -161,11 +161,11 @@ class _FlowingRingPainter extends CustomPainter {
           startAngle: segmentStart,
           endAngle: segmentStart + sweepAngle,
           colors: [
-            activeColor.withOpacity(0.0),
-            activeColor.withOpacity(0.8),
+            activeColor.withAlpha(0),
+            activeColor.withAlpha(204),
             activeColor,
-            activeColor.withOpacity(0.8),
-            activeColor.withOpacity(0.0),
+            activeColor.withAlpha(204),
+            activeColor.withAlpha(0),
           ],
           stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
         );
@@ -181,7 +181,7 @@ class _FlowingRingPainter extends CustomPainter {
       
       // 发光效果
       final glowPaint = Paint()
-        ..color = activeColor.withOpacity(0.3)
+        ..color = activeColor.withAlpha(77)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth + 4
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);

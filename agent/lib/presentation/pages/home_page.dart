@@ -323,7 +323,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               size: 200,
               strokeWidth: 6,
               activeColor: Colors.white,
-              inactiveColor: Colors.white.withOpacity(0.5),
+              inactiveColor: Colors.white.withAlpha(128),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -340,7 +340,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     loading: () => Text(
                       '¥0.00',
                       style: theme.textTheme.headlineLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withAlpha(128),
                         fontWeight: FontWeight.bold,
                         fontSize: 32,
                       ),
@@ -358,7 +358,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   Text(
                     '今日收款',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withAlpha(230),
                     ),
                   ),
                 ],
@@ -372,7 +372,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withAlpha(51),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -387,7 +387,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     boxShadow: isRunning
                         ? [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withAlpha(128),
                               blurRadius: 8,
                               spreadRadius: 2,
                             ),
@@ -425,13 +425,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                   Icon(
                     Icons.cloud_done_outlined,
                     size: 16,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(230),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     server.name,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withAlpha(230),
                     ),
                   ),
                 ],
@@ -445,12 +445,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 icon: Icon(
                   Icons.add_circle_outline,
                   size: 16,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withAlpha(230),
                 ),
                 label: Text(
                   '配置服务器',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(230),
                   ),
                 ),
               ),
@@ -544,7 +544,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -555,7 +555,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withAlpha(26),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: iconColor, size: 24),
@@ -621,7 +621,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withAlpha(13),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -664,8 +664,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         height: 48,
         decoration: BoxDecoration(
           color: isWechat
-              ? const Color(0xFF4CAF50).withOpacity(0.1)
-              : const Color(0xFF2196F3).withOpacity(0.1),
+              ? const Color(0xFF4CAF50).withAlpha(26)
+              : const Color(0xFF2196F3).withAlpha(26),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(

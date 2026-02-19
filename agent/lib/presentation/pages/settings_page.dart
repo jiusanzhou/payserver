@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/services/payment_listener_service.dart';
+import '../../core/services/battery_service.dart';
 import '../providers/server_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -17,6 +18,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _autoStart = true;
   bool _soundEnabled = true;
   bool _vibrationEnabled = true;
+  bool _batteryOptimizationIgnored = false;
 
   @override
   void initState() {
@@ -35,6 +37,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     // Check notification permission
     final hasPermission = await _checkNotificationPermission();
     setState(() => _notificationEnabled = hasPermission);
+
+    // Check battery optimization
+    final batteryIgnored = await BatteryService.isIgnoringBatteryOptimizations();
+    setState(() => _batteryOptimizationIgnored = batteryIgnored);
   }
 
   Future<bool> _checkNotificationPermission() async {
@@ -69,6 +75,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             subtitle: const Text('应用启动时自动开始监听'),
             value: _autoStart,
             onChanged: (value) => _setSetting('auto_start', value),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.battery_saver,
+              color: _batteryOptimizationIgnored ? Colors.green : Colors.orange,
+            ),
+            title: const Text('电池优化'),
+            subtitle: Text(_batteryOptimizationIgnored 
+                ? '已关闭优化（后台保活）' 
+                : '点击关闭电池优化以保持后台运行'),
+            trailing: _batteryOptimizationIgnored 
+                ? const Icon(Icons.check_circle, color: Colors.green)
+                : const Icon(Icons.warning, color: Colors.orange),
+            onTap: () => _requestBatteryOptimization(),
           ),
           const Divider(),
 
@@ -191,6 +211,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           break;
       }
     });
+  }
+
+  Future<void> _requestBatteryOptimization() async {
+    if (_batteryOptimizationIgnored) {
+      // Already ignored, show info dialog
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('已关闭电池优化，后台保活已启用')),
+        );
+      }
+      return;
+    }
+
+    // Request to ignore battery optimization
+    await BatteryService.requestIgnoreBatteryOptimizations();
+    
+    // Re-check after a delay (user may have granted permission)
+    await Future.delayed(const Duration(seconds: 1));
+    final isIgnored = await BatteryService.isIgnoringBatteryOptimizations();
+    setState(() => _batteryOptimizationIgnored = isIgnored);
   }
 
   void _showSyncSettings() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/payment_listener_service.dart';
+import '../../data/api/payserver_api.dart';
 import '../../domain/entities/transaction.dart' as tx;
 import '../providers/transaction_provider.dart' as tp;
 import '../providers/server_provider.dart';
@@ -104,7 +105,160 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showManualInputDialog(context),
+        icon: const Icon(Icons.add),
+        label: const Text('手动录入'),
+        backgroundColor: const Color(0xFF4CAF50),
+        foregroundColor: Colors.white,
+      ),
     );
+  }
+
+  Future<void> _showManualInputDialog(BuildContext context) async {
+    tx.PayType selectedType = tx.PayType.wechat;
+    final amountController = TextEditingController();
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('手动录入收款'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('支付渠道', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const SizedBox(height: 8),
+              SegmentedButton<tx.PayType>(
+                segments: [
+                  ButtonSegment(
+                    value: tx.PayType.wechat,
+                    label: const Text('微信'),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                  ),
+                  ButtonSegment(
+                    value: tx.PayType.alipay,
+                    label: const Text('支付宝'),
+                    icon: const Icon(Icons.account_balance_wallet_outlined),
+                  ),
+                ],
+                selected: {selectedType},
+                onSelectionChanged: (Set<tx.PayType> newSelection) {
+                  setDialogState(() {
+                    selectedType = newSelection.first;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              const Text('金额 (元)', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  hintText: '例如: 99.99',
+                  prefixText: '¥ ',
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final amountText = amountController.text.trim();
+                if (amountText.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('请输入金额')),
+                  );
+                  return;
+                }
+                final amount = double.tryParse(amountText);
+                if (amount == null || amount <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('请输入有效金额')),
+                  );
+                  return;
+                }
+                Navigator.pop(context, {
+                  'type': selectedType,
+                  'amount': (amount * 100).round(),
+                  'value': amountText,
+                });
+              },
+              child: const Text('确认'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      await _submitManualRecord(
+        result['type'] as tx.PayType,
+        result['amount'] as int,
+        result['value'] as String,
+      );
+    }
+  }
+
+  Future<void> _submitManualRecord(tx.PayType type, int amount, String value) async {
+    final transaction = tx.PayTransaction(
+      type: type,
+      value: value,
+      amount: amount,
+      createAt: DateTime.now(),
+      status: 0,
+      raw: 'manual_input',
+    );
+
+    // Save to local database via provider
+    final notifier = ref.read(tp.transactionNotifierProvider.notifier);
+    await notifier.insert(transaction);
+
+    // Upload to server
+    final server = ref.read(currentServerProvider);
+    if (server != null && server.uid.isNotEmpty) {
+      final api = PayServerApi(server: server, agentUid: server.uid);
+      final result = await api.uploadRecord(transaction);
+      if (result.isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('已录入 ${type.displayName} ¥$value'),
+              backgroundColor: const Color(0xFF4CAF50),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('已保存本地，上传失败: ${result.error}'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已录入 ${type.displayName} ¥$value（未配置服务器）'),
+            backgroundColor: const Color(0xFF4CAF50),
+          ),
+        );
+      }
+    }
+
+    // Refresh stats
+    ref.invalidate(tp.transactionStatsProvider);
   }
 
   Widget _buildStatusHeader(

@@ -4,6 +4,17 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Select,
   SelectContent,
@@ -20,7 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatPrice, formatDate } from "@/lib/utils"
-import { RefreshCw, Receipt, TrendingUp } from "lucide-react"
+import { RefreshCw, Receipt, TrendingUp, Plus } from "lucide-react"
 
 interface PayRecord {
   uid: string
@@ -42,10 +53,77 @@ const payTypeVariant: Record<string, "success" | "default"> = {
   alipay: "default",
 }
 
+interface Agent {
+  uid: string
+  device_id: string
+  device_info: string
+}
+
 export default function RecordsPage() {
   const [records, setRecords] = useState<PayRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [formData, setFormData] = useState({
+    type: "wechat",
+    amount: "",
+    number: "",
+    agent_uid: "",
+  })
+
+  const fetchAgents = async () => {
+    try {
+      const res = await fetch("/api/v1/agents")
+      const data = await res.json()
+      setAgents(data.agents || [])
+    } catch (err) {
+      console.error("Failed to fetch agents:", err)
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!formData.type || !formData.amount) {
+      alert("请填写支付渠道和金额")
+      return
+    }
+
+    const amountCents = Math.round(parseFloat(formData.amount) * 100)
+    if (isNaN(amountCents) || amountCents <= 0) {
+      alert("请输入有效的金额")
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/v1/records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: formData.type,
+          amount: amountCents,
+          number: formData.number || `MANUAL-${Date.now()}`,
+          agent_uid: formData.agent_uid || "manual",
+          timestamp: new Date().toISOString(),
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || "创建失败")
+      }
+
+      setDialogOpen(false)
+      setFormData({ type: "wechat", amount: "", number: "", agent_uid: "" })
+      fetchRecords()
+    } catch (err) {
+      console.error("Failed to create record:", err)
+      alert(err instanceof Error ? err.message : "创建失败")
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const fetchRecords = async () => {
     setLoading(true)
@@ -68,6 +146,10 @@ export default function RecordsPage() {
     fetchRecords()
   }, [typeFilter])
 
+  useEffect(() => {
+    fetchAgents()
+  }, [])
+
   const totalAmount = records.reduce((sum, r) => sum + r.amount, 0)
 
   return (
@@ -77,10 +159,103 @@ export default function RecordsPage() {
           <h1 className="text-2xl font-bold tracking-tight">收款记录</h1>
           <p className="text-muted-foreground">查看所有设备上报的收款记录</p>
         </div>
-        <Button onClick={fetchRecords} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          刷新
-        </Button>
+        <div className="flex gap-2">
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                手动录入
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>手动录入收款</DialogTitle>
+                <DialogDescription>
+                  手动添加一条收款记录，用于补录线下收款或其他渠道收款
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="type">支付渠道 *</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(v) => setFormData((f) => ({ ...f, type: v }))}
+                  >
+                    <SelectTrigger id="type">
+                      <SelectValue placeholder="选择渠道" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wechat">微信支付</SelectItem>
+                      <SelectItem value="alipay">支付宝</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="amount">金额 (元) *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="例如: 99.99"
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData((f) => ({ ...f, amount: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="number">流水号</Label>
+                  <Input
+                    id="number"
+                    placeholder="可选，留空自动生成"
+                    value={formData.number}
+                    onChange={(e) =>
+                      setFormData((f) => ({ ...f, number: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="agent">关联设备</Label>
+                  <Select
+                    value={formData.agent_uid}
+                    onValueChange={(v) =>
+                      setFormData((f) => ({ ...f, agent_uid: v }))
+                    }
+                  >
+                    <SelectTrigger id="agent">
+                      <SelectValue placeholder="可选，选择设备" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manual">手动录入 (无设备)</SelectItem>
+                      {agents.map((agent) => (
+                        <SelectItem key={agent.uid} value={agent.uid}>
+                          {agent.device_info || agent.device_id || agent.uid.slice(0, 8)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  disabled={submitting}
+                >
+                  取消
+                </Button>
+                <Button onClick={handleSubmit} disabled={submitting}>
+                  {submitting ? "提交中..." : "提交"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Button onClick={fetchRecords} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            刷新
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
